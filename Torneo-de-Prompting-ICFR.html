@@ -1,0 +1,1774 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Torneo de Prompting ICFR</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;900&display=swap">
+
+<style>
+/* ─── DESIGN TOKENS ─── */
+/* Layout: pantalla completa tipo torneo — ruleta centrada, panel revelación abajo */
+:root {
+  --bg:        #0a0e1a;
+  --surface:   #111827;
+  --border:    #1e2d45;
+  --fg:        #e8edf5;
+  --fg-dim:    #6b7fa3;
+  --gold:      #f5c842;
+  --gold-dim:  #a88820;
+  --accent:    #3b82f6;
+  --accent2:   #06b6d4;
+  --danger:    #ef4444;
+  --success:   #22c55e;
+
+  /* Sector palette — 11 colores distintos */
+  --s0:  #f59e0b; /* Finanzas Familiares */
+  --s1:  #ef4444; /* Atención y Crisis */
+  --s2:  #8b5cf6; /* Habilidades Blandas */
+  --s3:  #10b981; /* Salud Ocupacional */
+  --s4:  #3b82f6; /* Marketing Digital */
+  --s5:  #f97316; /* Convivencia Ciudadana */
+  --s6:  #06b6d4; /* Turismo Local */
+  --s7:  #ec4899; /* Orientación Laboral */
+  --s8:  #6366f1; /* Asesoría Legal */
+  --s9:  #84cc16; /* Impacto Social */
+  --s10: #14b8a6; /* Espacio Público */
+
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body:    'Inter', sans-serif;
+}
+
+/* Light theme override — minimal; pantalla de torneo siempre oscura */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg:      #0a0e1a;
+    --surface: #111827;
+    --fg:      #e8edf5;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] { color-scheme: dark; }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ─── LAYOUT ─── */
+#app {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100%;
+  padding: env(safe-area-inset-top,0px) max(16px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) max(16px,env(safe-area-inset-left,0px));
+  gap: 0;
+}
+
+/* Header */
+#header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 14px;
+  border-bottom: 1px solid var(--border);
+}
+#header .logo {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  letter-spacing: .06em;
+  color: var(--gold);
+  text-shadow: 0 0 24px #f5c84255;
+}
+#header .subtitle {
+  font-size: .75rem;
+  color: var(--fg-dim);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+#mode-switcher {
+  display: flex;
+  gap: 8px;
+}
+.mode-btn {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--fg-dim);
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: .75rem;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: all .2s;
+  letter-spacing: .06em;
+}
+.mode-btn:hover, .mode-btn.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+/* ─── MAIN AREA ─── */
+#main {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  align-items: center;
+  padding-block: 16px;
+  min-height: 0;
+}
+
+/* ─── RULETA ─── */
+#wheel-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  height: 100%;
+  justify-content: center;
+}
+
+#wheel-container {
+  position: relative;
+  width: min(52vh, 52vw, 480px);
+  aspect-ratio: 1;
+}
+
+#pointer {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 14px solid transparent;
+  border-right: 14px solid transparent;
+  border-top: 30px solid var(--gold);
+  filter: drop-shadow(0 0 8px #f5c84288);
+  z-index: 10;
+}
+
+#wheel-canvas {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px var(--gold-dim), 0 0 60px #3b82f622, 0 8px 40px #0008;
+}
+
+#wheel-center {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 60px; height: 60px;
+  background: var(--bg);
+  border: 3px solid var(--gold);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-size: .65rem;
+  letter-spacing: .1em;
+  color: var(--gold);
+  text-align: center;
+  line-height: 1.1;
+  z-index: 5;
+}
+
+#spin-btn {
+  padding: 14px 48px;
+  background: linear-gradient(135deg, var(--gold), #e6a800);
+  color: #0a0e1a;
+  border: none;
+  border-radius: 40px;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  letter-spacing: .12em;
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s, opacity .3s;
+  box-shadow: 0 4px 24px #f5c84244;
+}
+#spin-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px #f5c84266;
+}
+#spin-btn:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+/* QR overlay */
+#qr-overlay {
+  position: fixed;
+  bottom: 80px;
+  left: 20px;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Botón pantalla completa */
+#fullscreen-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 200;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--fg-dim);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: .72rem;
+  font-family: var(--font-body);
+  cursor: pointer;
+  letter-spacing: .06em;
+  transition: all .2s;
+}
+#fullscreen-btn:hover { border-color: var(--accent); color: var(--accent); }
+#qr-toggle {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--fg-dim);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: .72rem;
+  font-family: var(--font-body);
+  cursor: pointer;
+  letter-spacing: .06em;
+  transition: all .2s;
+}
+#qr-toggle:hover { border-color: var(--accent); color: var(--accent); }
+#qr-box {
+  background: #fff;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 8px 32px #0009;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+#qr-box.visible { display: flex; }
+#qr-box canvas { border-radius: 6px; }
+#qr-label {
+  font-size: .62rem;
+  color: #334155;
+  font-family: var(--font-body);
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  line-height: 1.4;
+}
+
+/* ─── PANEL LATERAL ─── */
+#side-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%;
+  justify-content: center;
+}
+
+/* Misión revelada */
+#mission-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  transition: border-color .4s;
+  position: relative;
+  overflow: hidden;
+}
+#mission-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--mission-color, var(--accent));
+  transition: background .4s;
+}
+#mission-number {
+  font-size: .7rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+}
+#mission-name {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  letter-spacing: .04em;
+  color: var(--mission-color, var(--gold));
+  line-height: 1.1;
+  transition: color .4s;
+  text-wrap: balance;
+}
+#mission-topic {
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: var(--fg-dim);
+  background: var(--bg);
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
+#mission-problem {
+  font-size: .82rem;
+  line-height: 1.65;
+  color: var(--fg);
+  flex: 1;
+}
+#mission-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 10px;
+  color: var(--fg-dim);
+  font-size: .85rem;
+  text-align: center;
+}
+#mission-placeholder .icon { font-size: 2.5rem; opacity: .3; }
+
+/* Restricción crítica */
+#restriction-card {
+  background: #1a0a0a;
+  border: 1px solid #3b1010;
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: none;
+  gap: 8px;
+  flex-direction: column;
+}
+#restriction-card.visible { display: flex; }
+#restriction-label {
+  font-size: .65rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--danger);
+  font-weight: 700;
+}
+#restriction-text {
+  font-size: .8rem;
+  line-height: 1.55;
+  color: #fca5a5;
+}
+
+/* ─── CRONÓMETRO ─── */
+#timer-bar {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+#timer-display {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  letter-spacing: .08em;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+  min-width: 120px;
+  transition: color .3s;
+}
+#timer-display.warning { color: var(--danger); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+#timer-controls { display: flex; gap: 10px; }
+.timer-btn {
+  padding: 8px 20px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: .8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .2s;
+  letter-spacing: .05em;
+}
+.timer-btn:hover { border-color: var(--accent); color: var(--accent); }
+.timer-btn.start { background: var(--success); border-color: var(--success); color: #000; }
+.timer-btn.start:hover { opacity: .85; }
+.timer-btn:disabled { opacity: .3; cursor: not-allowed; }
+
+#timer-track {
+  flex: 1;
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+#timer-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--success), var(--gold));
+  border-radius: 4px;
+  transition: width .5s linear, background .5s;
+  width: 100%;
+}
+#timer-fill.warning { background: var(--danger); }
+
+#round-counter {
+  font-size: .75rem;
+  color: var(--fg-dim);
+  letter-spacing: .08em;
+  white-space: nowrap;
+}
+
+/* ─── VISTA INSTRUCTOR / EQUIPO ─── */
+#alt-view {
+  display: none;
+  flex-direction: column;
+  gap: 20px;
+  padding-block: 20px;
+  height: 100%;
+  overflow-y: auto;
+}
+#alt-view.active { display: flex; }
+#main.hidden { display: none; }
+#timer-bar.hidden { display: none; }
+
+/* Scoreboard */
+#scoreboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+.team-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: border-color .3s;
+}
+.team-card.gold-medal { border-color: var(--gold); }
+.team-card.silver-medal { border-color: #94a3b8; }
+.team-card.bronze-medal { border-color: #92400e; }
+.team-name { font-weight: 700; font-size: .95rem; }
+.team-score {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+}
+.team-medal { font-size: 1.2rem; }
+.team-breakdown {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  font-size: .7rem;
+  color: var(--fg-dim);
+}
+.breakdown-item { text-align: center; }
+.breakdown-val { font-weight: 700; color: var(--fg); font-size: .85rem; }
+
+/* ─── FORMULARIO DE EQUIPO ─── */
+#team-form {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+.form-label {
+  font-size: .72rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  margin-bottom: 6px;
+  display: block;
+}
+.form-input, .form-textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: .9rem;
+  padding: 10px 14px;
+  transition: border-color .2s;
+  resize: vertical;
+}
+.form-input:focus, .form-textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+.form-textarea { min-height: 100px; }
+.form-submit {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  letter-spacing: .1em;
+  cursor: pointer;
+  transition: opacity .2s, transform .15s;
+}
+.form-submit:hover { opacity: .9; transform: translateY(-1px); }
+
+/* Panel instructor evaluación */
+#eval-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+.submission-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.submission-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.submission-team { font-weight: 700; font-size: 1rem; }
+.submission-mission { font-size: .75rem; color: var(--fg-dim); }
+.prompt-box, .output-box {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  font-size: .82rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.box-label {
+  font-size: .65rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--fg-dim);
+  margin-bottom: 6px;
+}
+/* Sliders de evaluación */
+.eval-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.eval-component { display: flex; flex-direction: column; gap: 4px; }
+.eval-component-label {
+  font-size: .72rem;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  color: var(--fg-dim);
+}
+.eval-component-label span { color: var(--gold); font-variant-numeric: tabular-nums; }
+.score-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border);
+  cursor: pointer;
+}
+.score-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--gold);
+  cursor: pointer;
+  box-shadow: 0 0 8px #f5c84244;
+}
+.auto-eval-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .7rem;
+  background: #1e3a1e;
+  color: var(--success);
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid #166534;
+}
+.publish-btn {
+  background: var(--success);
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-weight: 700;
+  font-size: .85rem;
+  cursor: pointer;
+  transition: opacity .2s;
+  align-self: flex-end;
+}
+.publish-btn:hover { opacity: .85; }
+.total-score-display {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  color: var(--gold);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.medal-badge {
+  font-size: .8rem;
+  padding: 3px 12px;
+  border-radius: 20px;
+  font-weight: 700;
+}
+.medal-gold   { background: #78350f; color: var(--gold); }
+.medal-silver { background: #1e293b; color: #94a3b8; }
+.medal-bronze { background: #1c1006; color: #92400e; }
+
+/* Empty state */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 40px;
+  color: var(--fg-dim);
+  text-align: center;
+}
+.empty-state .icon { font-size: 3rem; opacity: .25; }
+
+/* Reveal animation */
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.reveal { animation: reveal .4s ease both; }
+
+/* Responsive */
+@media (max-width: 700px) {
+  #main { grid-template-columns: 1fr; }
+  #side-panel { display: none; }
+  #wheel-container { width: min(85vw, 85vh); }
+  .eval-grid { grid-template-columns: 1fr; }
+}
+</style>
+
+<!-- ═══════════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- HEADER -->
+  <header id="header">
+    <div>
+      <div class="logo">🏆 Torneo de Prompting ICFR</div>
+      <div class="subtitle">Hackatón · La Restricción Blindada · SENA 21730210</div>
+    </div>
+    <div id="mode-switcher">
+      <button class="mode-btn active" onclick="setMode('tv')">📺 TV</button>
+      <button class="mode-btn" onclick="setMode('instructor')">🎓 Instructor</button>
+
+    </div>
+  </header>
+
+  <!-- ─── VISTA TV ─── -->
+  <div id="main">
+    <!-- RULETA -->
+    <div id="wheel-area">
+      <div id="wheel-container">
+        <div id="pointer"></div>
+        <canvas id="wheel-canvas"></canvas>
+        <div id="wheel-center">ICFR<br>TORNEO</div>
+      </div>
+      <button id="spin-btn" onclick="spinWheel()">⚡ GIRAR RULETA</button>
+    </div>
+
+    <!-- PANEL MISIÓN -->
+    <div id="side-panel">
+      <div id="mission-card">
+        <div id="mission-placeholder">
+          <div class="icon">🎯</div>
+          <div>Gira la ruleta para<br>revelar una misión</div>
+        </div>
+        <div id="mission-content" style="display:none; flex-direction:column; gap:10px;">
+          <div id="mission-number"></div>
+          <div id="mission-name"></div>
+          <div id="mission-topic"></div>
+          <div id="mission-problem"></div>
+        </div>
+      </div>
+      <div id="restriction-card">
+        <div id="restriction-label">⛔ Restricción [R] Crítica</div>
+        <div id="restriction-text"></div>
+      </div>
+    </div>
+  </div>
+
+  <button id="fullscreen-btn" onclick="toggleFullscreen()" title="Pantalla completa">⛶ Pantalla completa</button>
+
+  <!-- CRONÓMETRO -->
+  <div id="timer-bar">
+    <div id="timer-display">8:00</div>
+    <div id="timer-track"><div id="timer-fill"></div></div>
+    <div id="timer-controls">
+      <button class="timer-btn start" id="btn-start" onclick="startTimer()">▶ Iniciar</button>
+      <button class="timer-btn" id="btn-pause" onclick="pauseTimer()" disabled>⏸ Pausar</button>
+      <button class="timer-btn" id="btn-reset" onclick="resetTimer()">↺ Reset</button>
+    </div>
+    <div id="round-counter">Ronda <span id="round-num">1</span> · Equipos: <span id="teams-count">0</span> &nbsp;<span id="db-status" title="Estado de base de datos compartida" style="font-size:.65rem;padding:2px 8px;border-radius:20px;background:var(--surface);border:1px solid var(--border);cursor:help;">⏳ Conectando…</span></div>
+  </div>
+
+  <!-- ─── VISTA INSTRUCTOR / EQUIPO ─── -->
+  <div id="alt-view">
+    <!-- Instructor -->
+    <div id="instructor-view" style="display:none; flex-direction:column; gap:20px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div style="font-family:var(--font-display);font-size:1.4rem;letter-spacing:.06em;">Panel del Instructor</div>
+        <div style="display:flex;gap:8px;">
+          <button class="timer-btn" onclick="openManualModal()" style="color:var(--success);border-color:var(--success);">✏️ Entrega manual</button>
+          <button class="timer-btn" id="clear-btn" onclick="confirmClear()" style="color:var(--danger);border-color:var(--danger);">🗑 Limpiar</button>
+        </div>
+      </div>
+
+      <!-- MODAL ENTREGA MANUAL -->
+      <div id="manual-modal" style="display:none;position:fixed;inset:0;background:#0009;z-index:500;align-items:center;justify-content:center;padding:20px;">
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:16px;padding:28px;width:100%;max-width:560px;display:flex;flex-direction:column;gap:14px;max-height:90vh;overflow-y:auto;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div style="font-family:var(--font-display);font-size:1.1rem;letter-spacing:.06em;">✏️ Registrar entrega manual</div>
+            <button onclick="closeManualModal()" style="background:none;border:none;color:var(--fg-dim);font-size:1.4rem;cursor:pointer;">✕</button>
+          </div>
+          <div>
+            <label class="form-label">Nombre del Equipo</label>
+            <input class="form-input" id="m-team" type="text" placeholder="Ej: Equipo Alfa" required>
+          </div>
+          <div>
+            <label class="form-label">Misión Asignada</label>
+            <input class="form-input" id="m-mission" type="text" placeholder="Se autocompleta con la misión activa">
+          </div>
+          <div>
+            <label class="form-label">Prompt [I]+[C]+[F]+[R]</label>
+            <textarea class="form-textarea" id="m-prompt" rows="5" placeholder="Pega aquí el prompt del equipo…" style="min-height:120px;"></textarea>
+          </div>
+          <div>
+            <label class="form-label">Salida del LLM</label>
+            <textarea class="form-textarea" id="m-output" rows="4" placeholder="Pega aquí la respuesta del modelo…" style="min-height:100px;"></textarea>
+          </div>
+          <div id="m-error" hidden style="color:var(--danger);font-size:.85rem;margin-bottom:8px;"></div>
+          <button class="form-submit" onclick="submitManual()" style="font-size:1rem;padding:12px;">📥 Registrar entrega</button>
+        </div>
+      </div>
+      <!-- Scoreboard -->
+      <div style="font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-dim);">Marcador del Torneo</div>
+      <div id="scoreboard"></div>
+      <!-- Entregas pendientes -->
+      <div style="font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--fg-dim);">Entregas Pendientes de Evaluación</div>
+      <div id="eval-panel"></div>
+    </div>
+
+
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATOS DE LAS 11 MISIONES
+// ═══════════════════════════════════════════════════════════
+const MISSIONS = [
+  {
+    id: 1,
+    name: "El Mercado Imposible",
+    topic: "Finanzas Familiares",
+    color: "#f59e0b",
+    emoji: "🛒",
+    problem: "Una familia de 3 personas en Medellín cuenta con $150.000 COP para almuerzos y cenas de lunes a viernes. Sin tiempo para preparaciones de más de 45 minutos ni acceso a productos importados; solo tienda de barrio o plaza de mercado.",
+    restriction: "Sin salmón, mariscos ni cortes finos. Ninguna receta que supere los 45 minutos de cocción. Presupuesto máximo: $150.000 COP.",
+    limit: "Tabla menú 5 días + lista de compras con cantidades y costos."
+  },
+  {
+    id: 2,
+    name: "Salvar el Negocio",
+    topic: "Atención y Crisis en Redes",
+    color: "#ef4444",
+    emoji: "🍰",
+    problem: "Una repostería artesanal entregó una torta con 40 min de retraso y cobertura corrida. El cliente exige reembolso del 100% por WhatsApp y amenaza con destruir la reputación en redes. Devolver todo genera pérdidas graves.",
+    restriction: "Prohibido culpar al domiciliario o al tráfico. Sin tecnicismos jurídicos. Sin sonar a respuesta automática de call center.",
+    limit: "3 párrafos cortos, máximo 120 palabras, tono empático y humano."
+  },
+  {
+    id: 3,
+    name: "La Conversación Incómoda",
+    topic: "Habilidades Blandas y Liderazgo",
+    color: "#8b5cf6",
+    emoji: "🤝",
+    problem: "Un compañero entrega trabajo técnico de alta calidad, pero en 2 semanas ha retrasado planillas de inventario 2 días, deteniendo despachos matutinos y afectando métricas del grupo. Se requiere charla presencial hoy.",
+    restriction: "Prohibidas las palabras absolutas ('siempre', 'nunca') y adjetivos que califiquen negativamente la personalidad ('irresponsable', 'descuidado').",
+    limit: "Guion de 3 pasos: Hecho observable → Impacto operativo → Pregunta abierta. Máximo 150 palabras."
+  },
+  {
+    id: 4,
+    name: "Entrenar sin Lesión",
+    topic: "Salud Ocupacional y Bienestar",
+    color: "#10b981",
+    emoji: "💪",
+    problem: "Usuario de 30 años, empleo sedentario, 2+ años sin actividad física, molestia lumbar baja. Desea rutina en casa 4 días/semana. Sin presupuesto para gimnasio, sin pesas ni máquinas.",
+    restriction: "Cero ejercicios de alto impacto (burpees, saltos de cuerda). Cero cargas axiales sobre la columna. Únicamente peso corporal o bandas elásticas.",
+    limit: "Tabla de 4 columnas: Día / Ejercicio / Series-Repeticiones / Descanso."
+  },
+  {
+    id: 5,
+    name: "Llenar el Taller con Celular",
+    topic: "Marketing y Contenido Digital",
+    color: "#3b82f6",
+    emoji: "📸",
+    problem: "Fotógrafo independiente organiza taller de fotografía urbana para usuarios solo con celular. Faltan 4 días y quedan 10 cupos. Necesita campaña en Instagram: carrusel, reel y post estático.",
+    restriction: "Sin tecnicismos avanzados (ISO, diafragma, RAW). Sin referencias a cámaras réflex o profesionales. Máximo 2 emojis por publicación.",
+    limit: "3 piezas completas (gancho + texto + CTA + hashtags). Máximo 60 palabras cada una."
+  },
+  {
+    id: 6,
+    name: "Carta al Vecino Ruidoso",
+    topic: "Convivencia Ciudadana",
+    color: "#f97316",
+    emoji: "🏢",
+    problem: "Vecino del piso superior pone música hasta las 2 a.m. los jueves y viernes; su mascota ladra sola durante el día. Los reclamos verbales derivaron en discusiones. Se requiere carta formal bajo la puerta antes de instancias policivas.",
+    restriction: "Sin adjetivos ofensivos ('desconsiderado', 'mal vecino'). Sin amenazas jurídicas inmediatas. Sin tono sarcástico. Mediación pacífica.",
+    limit: "Carta formal, máximo 130 palabras."
+  },
+  {
+    id: 7,
+    name: "Fin de Semana Mochilero",
+    topic: "Turismo Local y Aventura",
+    color: "#06b6d4",
+    emoji: "🎒",
+    problem: "Pareja de jóvenes, escapada sábado-domingo desde Medellín (Guatapé, Santa Fe de Antioquia o Jardín). Sin vehículo. Presupuesto total: $250.000 COP para transporte, alimentación y hospedaje.",
+    restriction: "Sin hoteles boutique o resorts. Sin taxis ni apps de movilidad privada. Sin tours en dólares. Sin cotizaciones que superen los $250.000 COP.",
+    limit: "Itinerario hora a hora + tabla de presupuesto desglosada al centavo."
+  },
+  {
+    id: 8,
+    name: "Giro Laboral a los 42",
+    topic: "Orientación y Reubicación Laboral",
+    color: "#ec4899",
+    emoji: "💼",
+    problem: "Trabajadora de 42 años, 18 años como cajera. Por várices y fatiga articular, médico exige abandonar labores de pie. Quiere migrar a labores administrativas o soporte digital remoto. Sin título universitario ni recursos para carrera.",
+    restriction: "Sin carreras universitarias largas (5 años). Sin cursos con suscripciones de pago. Sin tecnicismos en inglés sin explicar. Solo ecosistema público (SENA, Google Actívate).",
+    limit: "Plan de reconversión a 6 meses en etapas con habilidades transferibles identificadas."
+  },
+  {
+    id: 9,
+    name: "Renegociar la Deuda Bancaria",
+    topic: "Asesoría Legal y Financiera",
+    color: "#6366f1",
+    emoji: "📋",
+    problem: "Ciudadano con $4.500.000 COP en tarjeta, 60 días de mora. Capacidad real: $200.000 COP/mes. Casas de cobranza acosan telefónicamente. Requiere propuesta formal de acuerdo de pago ante el banco.",
+    restriction: "Sin tono suplicante. Sin cláusulas aceleratorias lesivas. Sin prometer cuotas >$200.000 COP. Con cita de derechos del consumidor financiero colombiano.",
+    limit: "Derecho de petición formal, máximo 1 página tamaño carta."
+  },
+  {
+    id: 10,
+    name: "Adopción del Perro Criollo",
+    topic: "Impacto Social y Comunitario",
+    color: "#84cc16",
+    emoji: "🐕",
+    problem: "Fundación protectora tiene perro mestizo adulto (4 años, mediano-grande), 8 meses sin adoptar porque las familias piden cachorros de raza pequeña. Requiere publicación en redes que resalte sus virtudes.",
+    restriction: "Sin chantaje emocional ni victimismo ('si no lo adoptan lo sacrificaremos'). Tono optimista y digno. Requisitos de tenencia responsable en menos de 90 palabras.",
+    limit: "Historia + ficha técnica para Instagram y Facebook."
+  },
+  {
+    id: 11,
+    name: "Recuperación del Parque",
+    topic: "Espacio Público y Tejido Barrial",
+    color: "#14b8a6",
+    emoji: "🌳",
+    problem: "Parque infantil del barrio con juegos deteriorados, bancas despintadas y escombros. La JAC quiere convocar jornada comunitaria dominical de aseo, pintura y siembra con vecinos y comerciantes.",
+    restriction: "Prohibido solicitar dinero en efectivo. Sin reclamos políticos partidistas. Sin lenguaje burocrático o distante.",
+    limit: "Volante/circular casa por casa, máximo 100 palabras."
+  }
+];
+
+const SECTOR_COLORS = MISSIONS.map(m => m.color);
+const SECTOR_LABELS = MISSIONS.map(m => m.emoji + ' ' + m.topic);
+
+// ═══════════════════════════════════════════════════════════
+// RULETA
+// ═══════════════════════════════════════════════════════════
+const canvas = document.getElementById('wheel-canvas');
+const ctx = canvas.getContext('2d');
+let currentAngle = 0;
+let isSpinning = false;
+let animFrame;
+let currentMission = null;
+
+function initWheel() {
+  const size = canvas.offsetWidth * window.devicePixelRatio;
+  canvas.width = size;
+  canvas.height = size;
+  drawWheel(currentAngle);
+}
+
+function drawWheel(rotation) {
+  const W = canvas.width, H = canvas.height;
+  const cx = W / 2, cy = H / 2;
+  const r = Math.max(1, Math.min(cx, cy) - 4);
+  const n = MISSIONS.length;
+  const arc = (2 * Math.PI) / n;
+
+  ctx.clearRect(0, 0, W, H);
+
+  MISSIONS.forEach((m, i) => {
+    const startAngle = rotation + i * arc - Math.PI / 2;
+    const endAngle = startAngle + arc;
+    const midAngle = startAngle + arc / 2;
+
+    // Sector
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, startAngle, endAngle);
+    ctx.closePath();
+    ctx.fillStyle = m.color;
+    ctx.fill();
+
+    // Border
+    ctx.strokeStyle = 'rgba(10,14,26,0.7)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Emoji
+    const emojiR = r * 0.78;
+    const ex = cx + Math.cos(midAngle) * emojiR;
+    const ey = cy + Math.sin(midAngle) * emojiR;
+    ctx.save();
+    ctx.translate(ex, ey);
+    ctx.rotate(midAngle + Math.PI / 2);
+    ctx.font = `${r * 0.08}px serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(m.emoji, 0, 0);
+    ctx.restore();
+
+    // Number
+    const numR = r * 0.55;
+    const nx = cx + Math.cos(midAngle) * numR;
+    const ny = cy + Math.sin(midAngle) * numR;
+    ctx.save();
+    ctx.translate(nx, ny);
+    ctx.rotate(midAngle + Math.PI / 2);
+    ctx.font = `bold ${r * 0.075}px Inter, sans-serif`;
+    ctx.fillStyle = 'rgba(255,255,255,0.95)';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(m.id, 0, 0);
+    ctx.restore();
+  });
+
+  // Outer ring
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, 2 * Math.PI);
+  ctx.strokeStyle = '#f5c842';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  // Center circle
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.09, 0, 2 * Math.PI);
+  ctx.fillStyle = '#0a0e1a';
+  ctx.fill();
+  ctx.strokeStyle = '#f5c842';
+  ctx.lineWidth = 2;
+  ctx.stroke();
+}
+
+function spinWheel() {
+  if (isSpinning) return;
+  isSpinning = true;
+  document.getElementById('spin-btn').disabled = true;
+
+  // Hide previous mission
+  document.getElementById('mission-placeholder').style.display = 'flex';
+  document.getElementById('mission-content').style.display = 'none';
+  document.getElementById('restriction-card').classList.remove('visible');
+
+  // Random target
+  const targetIndex = Math.floor(Math.random() * MISSIONS.length);
+  const n = MISSIONS.length;
+  const arc = (2 * Math.PI) / n;
+
+  // Calculate end angle so targetIndex is at top (pointer)
+  const extraSpins = (5 + Math.floor(Math.random() * 4)) * 2 * Math.PI;
+  const sectorMid = targetIndex * arc + arc / 2;
+  const targetAngle = extraSpins - sectorMid;
+
+  const startAngle = currentAngle;
+  const delta = targetAngle - (currentAngle % (2 * Math.PI)) + extraSpins;
+  const duration = 4000 + Math.random() * 1500;
+  let startTime = null;
+
+  function easeOut(t) {
+    return 1 - Math.pow(1 - t, 4);
+  }
+
+  function animate(ts) {
+    if (!startTime) startTime = ts;
+    const elapsed = ts - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = easeOut(progress);
+
+    currentAngle = startAngle + delta * eased;
+    drawWheel(currentAngle);
+
+    if (progress < 1) {
+      animFrame = requestAnimationFrame(animate);
+    } else {
+      isSpinning = false;
+      document.getElementById('spin-btn').disabled = false;
+      revealMission(targetIndex);
+    }
+  }
+
+  requestAnimationFrame(animate);
+}
+
+function revealMission(index) {
+  const m = MISSIONS[index];
+  currentMission = m;
+
+  // Update mission card color
+  document.getElementById('mission-card').style.setProperty('--mission-color', m.color);
+  document.getElementById('mission-name').style.color = m.color;
+
+  // Fill content
+  document.getElementById('mission-number').textContent = `Misión ${m.id} de 11`;
+  document.getElementById('mission-name').textContent = `${m.emoji} ${m.name}`;
+  document.getElementById('mission-topic').textContent = m.topic;
+  document.getElementById('mission-problem').textContent = m.problem;
+  document.getElementById('restriction-text').textContent = m.restriction + '\n\nFormato requerido: ' + m.limit;
+
+  // Show
+  document.getElementById('mission-placeholder').style.display = 'none';
+  const content = document.getElementById('mission-content');
+  content.style.display = 'flex';
+  content.classList.remove('reveal');
+  void content.offsetWidth;
+  content.classList.add('reveal');
+
+  document.getElementById('restriction-card').classList.add('visible');
+
+  // Auto-fill equipo form
+  document.getElementById('f-mission').value = `Misión ${m.id}: ${m.name} (${m.topic})`;
+  document.getElementById('current-mission-badge').textContent = `🎯 Misión activa: ${m.emoji} ${m.name}`;
+  document.getElementById('current-mission-badge').style.display = 'block';
+}
+
+// ═══════════════════════════════════════════════════════════
+// CRONÓMETRO
+// ═══════════════════════════════════════════════════════════
+const TIMER_DURATION = 8 * 60; // 8 minutos
+let timerSeconds = TIMER_DURATION;
+let timerInterval = null;
+let timerRunning = false;
+
+function updateTimerDisplay() {
+  const m = Math.floor(timerSeconds / 60);
+  const s = timerSeconds % 60;
+  const display = document.getElementById('timer-display');
+  display.textContent = `${m}:${String(s).padStart(2,'0')}`;
+  display.classList.toggle('warning', timerSeconds <= 60);
+
+  const fill = document.getElementById('timer-fill');
+  const pct = (timerSeconds / TIMER_DURATION) * 100;
+  fill.style.width = pct + '%';
+  fill.classList.toggle('warning', timerSeconds <= 60);
+}
+
+function startTimer() {
+  if (timerRunning) return;
+  timerRunning = true;
+  document.getElementById('btn-start').disabled = true;
+  document.getElementById('btn-pause').disabled = false;
+  timerInterval = setInterval(() => {
+    if (timerSeconds > 0) {
+      timerSeconds--;
+      updateTimerDisplay();
+    } else {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      document.getElementById('btn-start').disabled = false;
+      document.getElementById('btn-pause').disabled = true;
+      document.getElementById('timer-display').textContent = '¡TIEMPO!';
+    }
+  }, 1000);
+}
+
+function pauseTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  document.getElementById('btn-start').disabled = false;
+  document.getElementById('btn-pause').disabled = true;
+}
+
+function resetTimer() {
+  pauseTimer();
+  timerSeconds = TIMER_DURATION;
+  updateTimerDisplay();
+  document.getElementById('timer-display').textContent = '8:00';
+  document.getElementById('timer-display').classList.remove('warning');
+}
+
+// ═══════════════════════════════════════════════════════════
+// MODOS DE VISTA
+// ═══════════════════════════════════════════════════════════
+function setMode(mode) {
+  // Update buttons
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  const main = document.getElementById('main');
+  const timerBar = document.getElementById('timer-bar');
+  const altView = document.getElementById('alt-view');
+  const instructorView = document.getElementById('instructor-view');
+  if (mode === 'tv') {
+    main.classList.remove('hidden');
+    timerBar.classList.remove('hidden');
+    altView.classList.remove('active');
+    unsubscribePendingEvals();
+  } else {
+    main.classList.add('hidden');
+    timerBar.classList.add('hidden');
+    altView.classList.add('active');
+    instructorView.style.display = 'flex';
+  }
+
+  if (mode === 'instructor') {
+    renderScoreboard();
+    subscribePendingEvals();
+  } else {
+    unsubscribePendingEvals();
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// EVALUACIÓN AUTOMÁTICA (lógica local inteligente)
+// ═══════════════════════════════════════════════════════════
+function autoEvaluate(prompt, output, mission) {
+  const p = prompt.toLowerCase();
+  const o = output.toLowerCase();
+
+  // [I] Instrucción — verbo imperativo + etiqueta
+  let scoreI = 0;
+  const hasTagI = /\[i\]/i.test(prompt);
+  const imperativeVerbs = /\b(redacta|diseña|elabora|crea|genera|formula|construye|escribe|analiza|desarrolla|describe|proporciona|lista|identifica)\b/i.test(prompt);
+  if (hasTagI && imperativeVerbs) scoreI = 20;
+  else if (imperativeVerbs || hasTagI) scoreI = 10;
+
+  // [C] Contexto — roles y escenario
+  let scoreC = 0;
+  const hasTagC = /\[c\]/i.test(prompt);
+  const hasContext = /contexto|escenario|usuario|cliente|empresa|persona|equipo|familia|trabajador|receptor/i.test(prompt);
+  const hasRoles = /rol|como|actúa|eres|dirigido a|para un/i.test(prompt);
+  if (hasTagC && hasContext && hasRoles) scoreC = 20;
+  else if ((hasTagC || hasContext) && hasRoles) scoreC = 14;
+  else if (hasTagC || hasContext) scoreC = 8;
+
+  // [F] Formato — estructura visual
+  let scoreF = 0;
+  const hasTagF = /\[f\]/i.test(prompt);
+  const hasFormat = /tabla|viñetas|párrafos?|palabras|columnas?|pasos?|lista|estructura|formato|límite|máximo|filas?/i.test(prompt);
+  const hasSpecific = /\d+\s*(palabras|párrafos?|pasos?|columnas?|filas?)/i.test(prompt);
+  if (hasTagF && hasFormat && hasSpecific) scoreF = 20;
+  else if (hasTagF && hasFormat) scoreF = 14;
+  else if (hasFormat) scoreF = 8;
+
+  // [R] Restricción — exclusiones negativas explícitas (NÚCLEO)
+  let scoreR = 0;
+  const hasTagR = /\[r\]/i.test(prompt);
+  const negationPatterns = [
+    /\b(sin|no|prohibe|prohibido|excluye|excluir|evita|evitar|omite|omitir|veta|vetar|impide|impedir)\b/gi,
+    /\b(nunca|jamás|tampoco|bajo ninguna circunstancia)\b/gi
+  ];
+  let restrictionCount = 0;
+  negationPatterns.forEach(pat => {
+    const matches = prompt.match(pat);
+    if (matches) restrictionCount += matches.length;
+  });
+
+  // Check if output violates restrictions
+  let outputViolation = false;
+  if (mission) {
+    const restrictionKeywords = mission.restriction.toLowerCase().split(/[,\.;\n]/);
+    restrictionKeywords.forEach(kw => {
+      const clean = kw.replace(/sin |no |prohibid[ao] /gi, '').trim();
+      if (clean.length > 4 && o.includes(clean)) outputViolation = true;
+    });
+  }
+
+  if (hasTagR && restrictionCount >= 3 && !outputViolation) scoreR = 40;
+  else if (hasTagR && restrictionCount >= 2) scoreR = 30;
+  else if (hasTagR && restrictionCount >= 1) scoreR = 20;
+  else if (restrictionCount >= 1) scoreR = 10;
+
+  if (outputViolation && scoreR > 0) scoreR = Math.max(0, scoreR - 20);
+
+  const total = scoreI + scoreC + scoreF + scoreR;
+  const breakdown = { I: scoreI, C: scoreC, F: scoreF, R: scoreR };
+
+  let medal, medalClass;
+  if (total >= 85) { medal = '🥇 Oro'; medalClass = 'medal-gold'; }
+  else if (total >= 65) { medal = '🥈 Plata'; medalClass = 'medal-silver'; }
+  else { medal = '🥉 Bronce'; medalClass = 'medal-bronze'; }
+
+  return { total, breakdown, medal, medalClass, outputViolation };
+}
+
+// ═══════════════════════════════════════════════════════════
+// BASE DE DATOS COMPARTIDA (db capability)
+// ═══════════════════════════════════════════════════════════
+let db = null;           // resuelto async al cargar
+let dbReady = false;
+// Cache local para sliders (ajustes del instructor antes de publicar)
+const localEvalCache = {};  // id → {breakdown, total, medal, medalClass}
+
+async function initDb() {
+  try {
+    const timeout = new Promise(resolve => setTimeout(() => resolve(null), 10000));
+    db = await Promise.race([claude.use('db'), timeout]);
+  } catch(e) {
+    db = null;
+  }
+  dbReady = true;
+  if (!db) {
+    console.warn('db no disponible — modo local activo');
+    showDbStatus(false);
+  } else {
+    showDbStatus(true);
+    subscribeScoreboard();
+  }
+}
+
+function showDbStatus(connected) {
+  const badge = document.getElementById('db-status');
+  if (!badge) return;
+  badge.textContent = connected ? '🟢 Tiempo real' : '🟡 Modo local';
+  badge.title = connected
+    ? 'Las entregas de los equipos llegan en tiempo real'
+    : 'Sin conexión a la base de datos compartida. Las entregas son locales a este navegador.';
+}
+
+// ─── Entregas locales (fallback) ─────────────────────────
+let localSubmissions = [];  // solo cuando db === null
+let localPublished = [];
+let roundNum = 1;
+
+// ─── Suscripciones activas ────────────────────────────────
+let unsubPending = null;
+let unsubScoreboard = null;
+let instructorModeActive = false;
+
+function subscribeScoreboard() {
+  if (!db || unsubScoreboard) return;
+  unsubScoreboard = db.collection('scoreboard')
+    .orderBy('total', 'desc')
+    .onSnapshot(snap => {
+      renderScoreboardFromDocs(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    });
+}
+
+function subscribePendingEvals() {
+  if (!db) {
+    renderPendingEvalsLocal();
+    return;
+  }
+  if (unsubPending) return;  // ya suscrito
+  unsubPending = db.collection('submissions')
+    .where('published', '==', false)
+    .onSnapshot(snap => {
+      const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      renderPendingEvalsFromDocs(docs);
+    });
+}
+
+function unsubscribePendingEvals() {
+  if (unsubPending) { unsubPending(); unsubPending = null; }
+}
+
+// ─── Envío del equipo ─────────────────────────────────────
+async function submitTeam(e) {
+  e.preventDefault();
+  const teamName = document.getElementById('f-team').value.trim();
+  const missionText = document.getElementById('f-mission').value;
+  const prompt = document.getElementById('f-prompt').value.trim();
+  const output = document.getElementById('f-output').value.trim();
+  if (!teamName || !prompt || !output) return;
+
+  const evalResult = autoEvaluate(prompt, output, currentMission);
+  const payload = {
+    team: teamName,
+    mission: missionText,
+    missionId: currentMission ? currentMission.id : null,
+    prompt,
+    output,
+    evalI: evalResult.breakdown.I,
+    evalC: evalResult.breakdown.C,
+    evalF: evalResult.breakdown.F,
+    evalR: evalResult.breakdown.R,
+    total: evalResult.total,
+    medal: evalResult.medal,
+    medalClass: evalResult.medalClass,
+    outputViolation: evalResult.outputViolation,
+    published: false,
+    ts: Date.now()
+  };
+
+  const btn = document.querySelector('#team-form .form-submit');
+  btn.disabled = true;
+
+  if (db) {
+    try {
+      await db.collection('submissions').add(payload);
+    } catch(err) {
+      console.error('Error al enviar:', err);
+      // fallback local
+      localSubmissions.push({ id: String(Date.now()), ...payload });
+    }
+  } else {
+    localSubmissions.push({ id: String(Date.now()), ...payload });
+  }
+
+  btn.disabled = false;
+  document.getElementById('team-form').reset();
+  document.getElementById('f-mission').value = missionText;
+  const fb = document.getElementById('submit-feedback');
+  fb.style.display = 'block';
+  setTimeout(() => fb.style.display = 'none', 4000);
+
+  // actualizar contador local
+  updateTeamCount();
+}
+
+function updateTeamCount() {
+  // Aproximado; el snapshot real actualiza el panel
+  const el = document.getElementById('teams-count');
+  if (el) el.textContent = db ? '—' : localSubmissions.filter(s=>!s.published).length;
+}
+
+// ─── Publicar evaluación ──────────────────────────────────
+async function publishSubmission(docId) {
+  const cache = localEvalCache[docId] || {};
+  const breakdown = cache.breakdown || null;
+  const total    = cache.total    != null ? cache.total : null;
+  const medal      = cache.medal    || null;
+  const medalClass = cache.medalClass || null;
+
+  if (db) {
+    try {
+      // Actualizar el documento de submission
+      const updatePayload = { published: true };
+      if (breakdown) {
+        updatePayload.evalI = breakdown.I;
+        updatePayload.evalC = breakdown.C;
+        updatePayload.evalF = breakdown.F;
+        updatePayload.evalR = breakdown.R;
+        updatePayload.total = total;
+        updatePayload.medal = medal;
+        updatePayload.medalClass = medalClass;
+      }
+      await db.doc('submissions/' + docId).update(updatePayload);
+
+      // Leer datos actualizados para crear la entrada del scoreboard
+      const subSnap = await db.doc('submissions/' + docId).get();
+      if (subSnap.exists) {
+        const d = subSnap.data();
+        await db.collection('scoreboard').add({
+          team: d.team,
+          mission: d.mission,
+          total: d.total,
+          evalI: d.evalI, evalC: d.evalC, evalF: d.evalF, evalR: d.evalR,
+          medal: d.medal,
+          medalClass: d.medalClass,
+          ts: Date.now()
+        });
+      }
+    } catch(err) {
+      console.error('Error al publicar:', err);
+    }
+  } else {
+    // Modo local
+    const sub = localSubmissions.find(s => s.id === docId);
+    if (!sub) return;
+    if (breakdown) {
+      sub.evalI = breakdown.I; sub.evalC = breakdown.C;
+      sub.evalF = breakdown.F; sub.evalR = breakdown.R;
+      sub.total = total; sub.medal = medal; sub.medalClass = medalClass;
+    }
+    sub.published = true;
+    localPublished.push(sub);
+    renderScoreboardLocal();
+    renderPendingEvalsLocal();
+  }
+  delete localEvalCache[docId];
+}
+
+// ─── Render Scoreboard ────────────────────────────────────
+function renderScoreboardFromDocs(docs) {
+  const board = document.getElementById('scoreboard');
+  if (!docs || docs.length === 0) {
+    board.innerHTML = '<div class="empty-state"><div class="icon">📊</div><div>Sin resultados publicados aún</div></div>';
+    return;
+  }
+  const sorted = [...docs].sort((a,b) => (b.total||0) - (a.total||0));
+  board.innerHTML = sorted.map((sub, i) => {
+    const mc = i === 0 ? 'gold-medal' : i === 1 ? 'silver-medal' : i === 2 ? 'bronze-medal' : '';
+    const em = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '';
+    return `
+    <div class="team-card ${mc} reveal">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div class="team-name">${em} ${escHtml(sub.team||'')}</div>
+        <div class="team-score">${sub.total||0}</div>
+      </div>
+      <div style="font-size:.72rem;color:var(--fg-dim);">${escHtml(sub.mission||'')}</div>
+      <div class="team-breakdown">
+        <div class="breakdown-item"><div class="breakdown-val">${sub.evalI||0}</div>[I]</div>
+        <div class="breakdown-item"><div class="breakdown-val">${sub.evalC||0}</div>[C]</div>
+        <div class="breakdown-item"><div class="breakdown-val">${sub.evalF||0}</div>[F]</div>
+        <div class="breakdown-item"><div class="breakdown-val">${sub.evalR||0}</div>[R]</div>
+      </div>
+      <span class="medal-badge ${sub.medalClass||''}">${sub.medal||''}</span>
+    </div>`;
+  }).join('');
+  // actualizar contador
+  const el = document.getElementById('teams-count');
+  if (el) el.textContent = docs.length;
+}
+
+function renderScoreboardLocal() {
+  renderScoreboardFromDocs(localPublished.map(s => ({
+    team: s.team, mission: s.mission, total: s.total,
+    evalI: s.evalI, evalC: s.evalC, evalF: s.evalF, evalR: s.evalR,
+    medal: s.medal, medalClass: s.medalClass
+  })));
+}
+
+function renderScoreboard() {
+  if (db) return;  // snapshot se encarga
+  renderScoreboardLocal();
+}
+
+// ─── Render Entregas Pendientes ───────────────────────────
+function renderPendingEvalsFromDocs(docs) {
+  const panel = document.getElementById('eval-panel');
+  if (!docs || docs.length === 0) {
+    panel.innerHTML = '<div class="empty-state"><div class="icon">📥</div><div>Sin entregas pendientes · esperando equipos…</div></div>';
+    const el = document.getElementById('teams-count');
+    return;
+  }
+
+  panel.innerHTML = docs.map(sub => {
+    // Tomar valores del cache local si el instructor ajustó sliders
+    const cache = localEvalCache[sub.id] || {};
+    const I = cache.breakdown ? cache.breakdown.I : (sub.evalI||0);
+    const C = cache.breakdown ? cache.breakdown.C : (sub.evalC||0);
+    const F = cache.breakdown ? cache.breakdown.F : (sub.evalF||0);
+    const R = cache.breakdown ? cache.breakdown.R : (sub.evalR||0);
+    const tot = cache.total != null ? cache.total : (sub.total||0);
+    const medal = cache.medal || sub.medal || '🥉 Bronce';
+    const medalClass = cache.medalClass || sub.medalClass || 'medal-bronze';
+    const violation = sub.outputViolation ? ' · ⚠️ posible violación de [R]' : ' · ✅ restricciones OK';
+
+    return `
+    <div class="submission-item reveal" data-docid="${sub.id}">
+      <div class="submission-header">
+        <div>
+          <div class="submission-team">👥 ${escHtml(sub.team||'')}</div>
+          <div class="submission-mission">${escHtml(sub.mission||'')}</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="total-score-display" id="ts-${sub.id}">${tot}</div>
+          <span class="medal-badge ${medalClass}" id="mb-${sub.id}">${medal}</span>
+        </div>
+      </div>
+      <div class="auto-eval-badge">🤖 Evaluación automática${violation}</div>
+      <div><div class="box-label">Prompt del equipo</div>
+        <div class="prompt-box">${escHtml(sub.prompt||'')}</div></div>
+      <div><div class="box-label">Salida del LLM</div>
+        <div class="output-box">${escHtml(sub.output||'')}</div></div>
+      <div class="eval-grid">
+        ${renderSlider(sub.id,'I','Instrucción',I,20)}
+        ${renderSlider(sub.id,'C','Contexto',C,20)}
+        ${renderSlider(sub.id,'F','Formato',F,20)}
+        ${renderSlider(sub.id,'R','Restricción ×2',R,40)}
+      </div>
+      <div style="display:flex;justify-content:flex-end;">
+        <button class="publish-btn" onclick="publishSubmission('${sub.id}')">
+          📢 Publicar en Scoreboard
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Listeners de sliders
+  docs.forEach(sub => {
+    const cache = localEvalCache[sub.id] || {};
+    if (!cache.breakdown) {
+      cache.breakdown = {
+        I: sub.evalI||0, C: sub.evalC||0, F: sub.evalF||0, R: sub.evalR||0
+      };
+      cache.total = sub.total||0;
+      cache.medal = sub.medal||'🥉 Bronce';
+      cache.medalClass = sub.medalClass||'medal-bronze';
+      localEvalCache[sub.id] = cache;
+    }
+    ['I','C','F','R'].forEach(comp => {
+      const slider = document.getElementById(`sl-${sub.id}-${comp}`);
+      const label  = document.getElementById(`lv-${sub.id}-${comp}`);
+      if (!slider || !label) return;
+      slider.addEventListener('input', () => {
+        label.textContent = slider.value;
+        localEvalCache[sub.id].breakdown[comp] = +slider.value;
+        const bd = localEvalCache[sub.id].breakdown;
+        const t = bd.I + bd.C + bd.F + bd.R;
+        localEvalCache[sub.id].total = t;
+        let m, mc;
+        if (t >= 85) { m = '🥇 Oro'; mc = 'medal-gold'; }
+        else if (t >= 65) { m = '🥈 Plata'; mc = 'medal-silver'; }
+        else { m = '🥉 Bronce'; mc = 'medal-bronze'; }
+        localEvalCache[sub.id].medal = m;
+        localEvalCache[sub.id].medalClass = mc;
+        const ts = document.getElementById(`ts-${sub.id}`);
+        const mb = document.getElementById(`mb-${sub.id}`);
+        if (ts) ts.textContent = t;
+        if (mb) { mb.textContent = m; mb.className = `medal-badge ${mc}`; }
+      });
+    });
+  });
+}
+
+function renderPendingEvalsLocal() {
+  const pending = localSubmissions.filter(s => !s.published);
+  renderPendingEvalsFromDocs(pending);
+}
+
+function renderPendingEvals() {
+  if (db) return;  // onSnapshot se encarga
+  renderPendingEvalsLocal();
+}
+
+function renderSlider(id, comp, label, val, max) {
+  return `
+  <div class="eval-component">
+    <div class="eval-component-label">
+      [${comp}] ${label} / ${max}
+      <span id="lv-${id}-${comp}">${val}</span>
+    </div>
+    <input type="range" class="score-slider" id="sl-${id}-${comp}"
+      min="0" max="${max}" step="${max === 40 ? 20 : 10}" value="${val}">
+  </div>`;
+}
+
+function confirmClear() {
+  const btn = document.getElementById('clear-btn');
+  if (btn.dataset.confirming === '1') {
+    btn.textContent = '🗑 Limpiar';
+    btn.dataset.confirming = '0';
+    clearSubmissions();
+  } else {
+    btn.textContent = '⚠️ ¿Confirmar?';
+    btn.dataset.confirming = '1';
+    setTimeout(() => { btn.textContent = '🗑 Limpiar'; btn.dataset.confirming = '0'; }, 3000);
+  }
+}
+
+async function clearSubmissions() {
+  if (db) {
+    try {
+      // Borrar submissions pendientes
+      const snap1 = await db.collection('submissions').get();
+      for (const d of snap1.docs) await db.doc('submissions/' + d.id).delete();
+      // Borrar scoreboard
+      const snap2 = await db.collection('scoreboard').get();
+      for (const d of snap2.docs) await db.doc('scoreboard/' + d.id).delete();
+    } catch(e) { console.error(e); }
+  } else {
+    localSubmissions = [];
+    localPublished = [];
+    renderScoreboardLocal();
+    renderPendingEvalsLocal();
+  }
+  document.getElementById('teams-count').textContent = '0';
+}
+
+// ─── Modal entrega manual ────────────────────────────────
+function openManualModal() {
+  const modal = document.getElementById('manual-modal');
+  modal.style.display = 'flex';
+  // Pre-rellenar misión activa
+  if (currentMission) {
+    document.getElementById('m-mission').value =
+      `Misión ${currentMission.id}: ${currentMission.name} (${currentMission.topic})`;
+  }
+  document.getElementById('m-team').focus();
+}
+
+function closeManualModal() {
+  document.getElementById('manual-modal').style.display = 'none';
+  ['m-team','m-prompt','m-output'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+}
+
+async function submitManual() {
+  const teamName = document.getElementById('m-team').value.trim();
+  const missionText = document.getElementById('m-mission').value.trim();
+  const prompt = document.getElementById('m-prompt').value.trim();
+  const output = document.getElementById('m-output').value.trim();
+
+  if (!teamName || !prompt || !output) {
+    // alert() bloqueado en artifact — mostrar error inline
+    const errEl = document.getElementById('m-error');
+    if (errEl) { errEl.textContent = '⚠️ Completa: Equipo, Prompt y Salida del LLM.'; errEl.hidden = false; }
+    return;
+  }
+  const errEl = document.getElementById('m-error');
+  if (errEl) errEl.hidden = true;
+
+  const evalResult = autoEvaluate(prompt, output, currentMission);
+  const payload = {
+    team: teamName,
+    mission: missionText || (currentMission ? `Misión ${currentMission.id}: ${currentMission.name}` : ''),
+    missionId: currentMission ? currentMission.id : null,
+    prompt, output,
+    evalI: evalResult.breakdown.I,
+    evalC: evalResult.breakdown.C,
+    evalF: evalResult.breakdown.F,
+    evalR: evalResult.breakdown.R,
+    total: evalResult.total,
+    medal: evalResult.medal,
+    medalClass: evalResult.medalClass,
+    outputViolation: evalResult.outputViolation,
+    published: false,
+    ts: Date.now(),
+    manual: true
+  };
+
+  if (db) {
+    try { await db.collection('submissions').add(payload); }
+    catch(e) {
+      localSubmissions.push({ id: String(Date.now()), ...payload });
+      renderPendingEvalsLocal();
+    }
+  } else {
+    localSubmissions.push({ id: String(Date.now()), ...payload });
+    renderPendingEvalsLocal();
+  }
+
+  updateTeamCount();
+  closeManualModal();
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ═══════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════
+// QR CODE
+// ═══════════════════════════════════════════════════════════
+// ─── Pantalla completa ───────────────────────────────────
+function toggleFullscreen() {
+  const btn = document.getElementById('fullscreen-btn');
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen().catch(() => {});
+  }
+}
+document.addEventListener('fullscreenchange', () => {
+  const btn = document.getElementById('fullscreen-btn');
+  if (!btn) return;
+  btn.textContent = document.fullscreenElement ? '✕ Salir pantalla completa' : '⛶ Pantalla completa';
+});
+
+const ARTIFACT_URL = 'https://claude.ai/artifact/XZtBowyi92AcM3ZYbvDQTz';
+let qrDrawn = false;
+
+function toggleQR() {
+  const box = document.getElementById('qr-box');
+  const btn = document.getElementById('qr-toggle');
+  const visible = box.classList.toggle('visible');
+  btn.textContent = visible ? '✕ Ocultar QR' : '📱 Mostrar QR';
+  if (visible && !qrDrawn) {
+    drawQR(ARTIFACT_URL);
+  }
+}
+
+function drawQR(url) {
+  const canvas = document.getElementById('qr-canvas');
+  const size = 180;
+  canvas.width = size;
+  canvas.height = size;
+
+  // Cargar qrcodejs desde CDN
+  const script = document.createElement('script');
+  script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+  script.onload = () => {
+    const tmp = document.createElement('div');
+    tmp.style.cssText = 'position:absolute;left:-9999px;top:-9999px;';
+    document.body.appendChild(tmp);
+    new QRCode(tmp, {
+      text: url,
+      width: size,
+      height: size,
+      colorDark: '#0f172a',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+    setTimeout(() => {
+      const qrImg = tmp.querySelector('img');
+      const qrCvs = tmp.querySelector('canvas');
+      const ctx = canvas.getContext('2d');
+      if (qrCvs) {
+        ctx.drawImage(qrCvs, 0, 0, size, size);
+        qrDrawn = true;
+      } else if (qrImg && qrImg.complete) {
+        const i = new Image();
+        i.onload = () => { ctx.drawImage(i, 0, 0, size, size); qrDrawn = true; };
+        i.src = qrImg.src;
+      }
+      document.body.removeChild(tmp);
+    }, 400);
+  };
+  document.head.appendChild(script);
+}
+
+window.addEventListener('load', () => {
+  initWheel();
+  updateTimerDisplay();
+  renderScoreboard();
+  renderPendingEvals();
+  initDb();
+});
+
+window.addEventListener('resize', initWheel);
+</script>
+
+</body></html>

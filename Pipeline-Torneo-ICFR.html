@@ -1,0 +1,350 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Pipeline Torneo ICFR</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Bebas+Neue&display=swap">
+
+<style>
+:root {
+  --bg: #0f172a; --surface: #1e293b; --surface2: #263347;
+  --border: #334155; --fg: #e2e8f0; --fg-dim: #94a3b8;
+  --gold: #f5c842; --accent: #3b82f6; --success: #22c55e;
+  --danger: #ef4444; --purple: #a855f7;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f8fafc; --surface: #ffffff; --surface2: #f1f5f9;
+    --border: #e2e8f0; --fg: #0f172a; --fg-dim: #64748b;
+    color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #f8fafc; --surface: #ffffff; --surface2: #f1f5f9;
+  --border: #e2e8f0; --fg: #0f172a; --fg-dim: #64748b;
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 15px; line-height: 1.6;
+  padding-block: 32px;
+  padding-left: max(16px, env(safe-area-inset-left,0px));
+  padding-right: max(16px, env(safe-area-inset-right,0px));
+}
+
+/* ---- Header ---- */
+.page-header { max-width: 820px; margin: 0 auto 36px; }
+.page-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  letter-spacing: .07em; color: var(--gold);
+  line-height: 1;
+}
+.page-sub { font-size: .8rem; color: var(--fg-dim); letter-spacing: .12em; text-transform: uppercase; margin-top: 4px; }
+.page-meta { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+.badge {
+  font-size: .72rem; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; padding: 3px 10px; border-radius: 20px;
+  background: var(--surface); border: 1px solid var(--border);
+}
+
+/* ---- Sections ---- */
+.section { max-width: 820px; margin: 0 auto 32px; }
+.section-title {
+  font-family: var(--font-display); font-size: 1.3rem;
+  letter-spacing: .06em; color: var(--accent);
+  margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* ---- ICFR table ---- */
+table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+th, td { padding: 9px 12px; border: 1px solid var(--border); text-align: left; }
+th { background: var(--surface2); font-weight: 600; font-size: .78rem; letter-spacing: .06em; text-transform: uppercase; color: var(--fg-dim); }
+tr:nth-child(even) td { background: var(--surface2); }
+.tag { font-weight: 700; color: var(--gold); }
+
+/* ---- Steps ---- */
+.steps { display: flex; flex-direction: column; gap: 0; }
+.step {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 0 16px;
+  position: relative;
+}
+.step:not(:last-child) .step-line {
+  position: absolute; left: 23px; top: 48px; bottom: 0;
+  width: 2px; background: var(--border);
+}
+.step-num {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-size: 1.2rem;
+  flex-shrink: 0; z-index: 1; position: relative;
+  margin-top: 2px;
+}
+.step-body { padding-bottom: 24px; }
+.step-title { font-weight: 700; font-size: .97rem; margin-bottom: 4px; }
+.step-desc { font-size: .86rem; color: var(--fg-dim); line-height: 1.55; }
+.step-link {
+  display: inline-block; margin-top: 6px;
+  font-size: .78rem; font-weight: 600;
+  color: var(--accent); letter-spacing: .04em;
+  word-break: break-all;
+}
+
+/* Step color variants */
+.step-prep .step-num { background: #334155; color: var(--fg-dim); }
+.step-tv   .step-num { background: #1e3a5f; color: #60a5fa; }
+.step-inst .step-num { background: #14532d; color: #4ade80; }
+.step-meet .step-num { background: #3b1f6b; color: #c084fc; }
+.step-score .step-num { background: #7c2d12; color: #fb923c; }
+
+/* ---- Medals ---- */
+.medals { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; }
+.medal-card {
+  flex: 1; min-width: 140px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px;
+  text-align: center;
+}
+.medal-icon { font-size: 2rem; }
+.medal-name { font-weight: 700; font-size: .9rem; margin-top: 4px; }
+.medal-pts { font-size: .8rem; color: var(--fg-dim); }
+
+/* ---- Links table ---- */
+.links-grid { display: grid; gap: 10px; }
+.link-row {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 16px;
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+}
+.link-label { font-weight: 700; font-size: .85rem; min-width: 160px; }
+.link-url {
+  font-size: .78rem; color: var(--accent);
+  word-break: break-all; flex: 1;
+}
+.link-desc { font-size: .78rem; color: var(--fg-dim); width: 100%; }
+
+/* ---- Divider ---- */
+hr { border: none; border-top: 1px solid var(--border); margin: 8px 0 24px; max-width: 820px; }
+</style>
+
+<!-- ===== HEADER ===== -->
+<div class="page-header">
+  <div class="page-title">🏆 Pipeline — Torneo de Prompting ICFR</div>
+  <div class="page-sub">ADSO 228118 · SENA CDMC Itagüí · Modalidad Virtual</div>
+  <div class="page-meta">
+    <span class="badge">📅 Nov 2026</span>
+    <span class="badge">👥 8 Equipos</span>
+    <span class="badge">🎯 11 Misiones</span>
+    <span class="badge">📡 Google Meet</span>
+  </div>
+</div>
+
+<!-- ===== SECCIÓN 1: ICFR ===== -->
+<div class="section">
+  <div class="section-title">📐 Marco de Evaluación ICFR</div>
+  <table>
+    <thead>
+      <tr><th>Componente</th><th>Pts</th><th>¿Qué evalúa?</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="tag">[I]</span> Instrucción</td><td>20</td><td>Tarea clara, accionable y sin ambigüedad</td></tr>
+      <tr><td><span class="tag">[C]</span> Contexto</td><td>20</td><td>Rol del LLM, dominio y situación bien definidos</td></tr>
+      <tr><td><span class="tag">[F]</span> Formato</td><td>20</td><td>Estructura de salida especificada (tabla, carta, lista…)</td></tr>
+      <tr><td><span class="tag">[R]</span> Restricción</td><td>40</td><td>Límites precisos que acotan y mejoran la respuesta</td></tr>
+    </tbody>
+  </table>
+  <div class="medals" style="margin-top:16px;">
+    <div class="medal-card"><div class="medal-icon">🥇</div><div class="medal-name">Oro</div><div class="medal-pts">≥ 85 pts</div></div>
+    <div class="medal-card"><div class="medal-icon">🥈</div><div class="medal-name">Plata</div><div class="medal-pts">65 – 84 pts</div></div>
+    <div class="medal-card"><div class="medal-icon">🥉</div><div class="medal-name">Bronce</div><div class="medal-pts">< 65 pts</div></div>
+  </div>
+</div>
+
+<!-- ===== SECCIÓN 2: PREPARACIÓN ===== -->
+<div class="section">
+  <div class="section-title">⚙️ Preparación (antes de la sesión)</div>
+  <div class="steps">
+    <div class="step step-prep">
+      <div class="step-line"></div>
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <div class="step-title">Abrir Chrome y preparar las dos pestañas</div>
+        <div class="step-desc">
+          Abre Google Chrome. Crea dos pestañas con el mismo link de la ruleta:<br>
+          <strong>Pestaña 1 — TV / Ruleta</strong> (la que compartes en Meet)<br>
+          <strong>Pestaña 2 — Instructor</strong> (en tu portátil, privada)
+        </div>
+        <span class="step-link">https://claude.ai/artifact/XZtBowyi92AcM3ZYbvDQTz</span>
+      </div>
+    </div>
+    <div class="step step-prep">
+      <div class="step-line"></div>
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <div class="step-title">Configurar Pestaña 1 → modo TV</div>
+        <div class="step-desc">En la Pestaña 1 haz clic en <strong>📺 Modo TV</strong>. Se muestra la ruleta animada. Esta pestaña va a la pantalla compartida en Meet.</div>
+      </div>
+    </div>
+    <div class="step step-prep">
+      <div class="step-line"></div>
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <div class="step-title">Configurar Pestaña 2 → modo Instructor</div>
+        <div class="step-desc">En la Pestaña 2 haz clic en <strong>🎓 Instructor</strong>. Desde aquí registras entregas, calificás y subís al marcador. No compartas esta pestaña.</div>
+      </div>
+    </div>
+    <div class="step step-prep">
+      <div class="step-line"></div>
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <div class="step-title">Limpiar marcador de sesiones anteriores</div>
+        <div class="step-desc">En la Pestaña 2 (Instructor) clic en <strong>🗑 Limpiar</strong>, luego confirma con el segundo clic en <strong>⚠️ ¿Confirmar?</strong> (aparece en 3 s).</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SECCIÓN 3: PIPELINE VIRTUAL ===== -->
+<div class="section">
+  <div class="section-title">🔄 Pipeline Virtual — Paso a Paso</div>
+  <div class="steps">
+
+    <div class="step step-meet">
+      <div class="step-line"></div>
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <div class="step-title">Iniciar la sesión de Google Meet</div>
+        <div class="step-desc">Crea o abre el Meet del grupo. Envía el link a los aprendices por el canal del grupo (WhatsApp / Teams / correo).</div>
+      </div>
+    </div>
+
+    <div class="step step-tv">
+      <div class="step-line"></div>
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <div class="step-title">Compartir Pestaña 1 (ruleta) en Meet</div>
+        <div class="step-desc">En Meet → <strong>Presentar ahora → Una pestaña</strong> → selecciona la Pestaña 1 (ruleta/TV). Los aprendices ven la ruleta animada en sus pantallas.</div>
+      </div>
+    </div>
+
+    <div class="step step-tv">
+      <div class="step-line"></div>
+      <div class="step-num">7</div>
+      <div class="step-body">
+        <div class="step-title">Girar la ruleta para elegir equipo y misión</div>
+        <div class="step-desc">En la Pestaña 1, haz clic en <strong>🎰 Girar</strong>. La ruleta elige el equipo. Gira de nuevo para elegir la misión. Todos lo ven en tiempo real.</div>
+      </div>
+    </div>
+
+    <div class="step step-tv">
+      <div class="step-line"></div>
+      <div class="step-num">8</div>
+      <div class="step-body">
+        <div class="step-title">Revelar el reto al equipo</div>
+        <div class="step-desc">Comparte el link del documento de retos con los aprendices (pueden abrirlo en su celular o computador). El equipo seleccionado tiene 5–10 min para construir el prompt.</div>
+        <span class="step-link">https://docs.google.com/forms/d/1L4DkfZre7S57RmSQrm37vxmWlXRZl5Mb9Ggf7-Ra-kE/edit</span>
+      </div>
+    </div>
+
+    <div class="step step-inst">
+      <div class="step-line"></div>
+      <div class="step-num">9</div>
+      <div class="step-body">
+        <div class="step-title">Recibir la entrega del equipo</div>
+        <div class="step-desc">
+          El equipo envía su prompt de dos formas (una sola es suficiente):<br>
+          <strong>Opción A:</strong> Formulario Google Forms (el equipo llena y envía)<br>
+          <strong>Opción B:</strong> El instructor digita directamente en Pestaña 2 → <em>Entrega manual</em>
+        </div>
+        <span class="step-link">https://forms.gle/X8XktXzP1Sts6UG98</span>
+      </div>
+    </div>
+
+    <div class="step step-inst">
+      <div class="step-line"></div>
+      <div class="step-num">10</div>
+      <div class="step-body">
+        <div class="step-title">Calificar el prompt en Pestaña 2</div>
+        <div class="step-desc">
+          En la Pestaña 2 → sección <strong>Pendientes</strong>. Evalúa:<br>
+          • <span class="tag">[I]</span> 0–20 · <span class="tag">[C]</span> 0–20 · <span class="tag">[F]</span> 0–20 · <span class="tag">[R]</span> 0–40<br>
+          Ajusta cada slider → el sistema calcula el total y asigna la medalla automáticamente.
+        </div>
+      </div>
+    </div>
+
+    <div class="step step-score">
+      <div class="step-line"></div>
+      <div class="step-num">11</div>
+      <div class="step-body">
+        <div class="step-title">Subir al marcador y mostrar resultado</div>
+        <div class="step-desc">Haz clic en <strong>✅ Subir al marcador</strong>. El puntaje se acumula en el marcador del equipo. Cambia a la Pestaña 1 para mostrar el marcador actualizado a toda la clase.</div>
+      </div>
+    </div>
+
+    <div class="step step-meet">
+      <div class="step-num">12</div>
+      <div class="step-body">
+        <div class="step-title">Repetir para cada equipo / misión</div>
+        <div class="step-desc">Vuelve al Paso 7. Cada equipo acumula puntos a lo largo de las 11 misiones. Al finalizar todas las rondas, el marcador muestra el puntaje total acumulado por equipo.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== SECCIÓN 4: FLUJO INSTRUCTOR ===== -->
+<div class="section">
+  <div class="section-title">🎓 Flujo Rápido del Instructor</div>
+  <table>
+    <thead>
+      <tr><th>Acción</th><th>Pestaña</th><th>Dónde hacer clic</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Ver ruleta / girar</td><td>Pestaña 1 (TV)</td><td>Botón 🎰 Girar</td></tr>
+      <tr><td>Registrar entrega manual</td><td>Pestaña 2 (Instructor)</td><td>Formulario → 📥 Registrar entrega</td></tr>
+      <tr><td>Calificar prompt</td><td>Pestaña 2 (Instructor)</td><td>Sección Pendientes → sliders ICFR</td></tr>
+      <tr><td>Subir al marcador</td><td>Pestaña 2 (Instructor)</td><td>✅ Subir al marcador</td></tr>
+      <tr><td>Ver marcador total</td><td>Pestaña 1 o 2</td><td>Pestaña Marcador</td></tr>
+      <tr><td>Limpiar todo</td><td>Pestaña 2 (Instructor)</td><td>🗑 Limpiar → ⚠️ ¿Confirmar?</td></tr>
+    </tbody>
+  </table>
+  <div style="margin-top:12px; padding:12px 16px; background:var(--surface); border:1px solid var(--border); border-left:3px solid var(--danger); border-radius:0 8px 8px 0; font-size:.85rem;">
+    ⚠️ <strong>Importante:</strong> Los datos solo existen en la Pestaña 2 de tu navegador. No cambies de pestaña al momento de registrar. Cada pestaña tiene su propia memoria independiente.
+  </div>
+</div>
+
+<!-- ===== SECCIÓN 5: LINKS ===== -->
+<div class="section">
+  <div class="section-title">🔗 Links del Torneo</div>
+  <div class="links-grid">
+    <div class="link-row">
+      <div class="link-label">🎡 Ruleta / TV / Instructor</div>
+      <div class="link-url">https://claude.ai/artifact/XZtBowyi92AcM3ZYbvDQTz</div>
+      <div class="link-desc">Abrir en dos pestañas de Chrome — una en modo TV, otra en modo Instructor</div>
+    </div>
+    <div class="link-row">
+      <div class="link-label">📋 Formulario (aprendices)</div>
+      <div class="link-url">https://forms.gle/X8XktXzP1Sts6UG98</div>
+      <div class="link-desc">Los aprendices envían aquí su prompt + salida del LLM</div>
+    </div>
+    <div class="link-row">
+      <div class="link-label">📋 Formulario (editor)</div>
+      <div class="link-url">https://docs.google.com/forms/d/1L4DkfZre7S57RmSQrm37vxmWlXRZl5Mb9Ggf7-Ra-kE/edit</div>
+      <div class="link-desc">Panel de edición y respuestas del formulario (solo instructor)</div>
+    </div>
+    <div class="link-row">
+      <div class="link-label">📚 Ejemplos ICFR (11 misiones)</div>
+      <div class="link-url">https://claude.ai/artifact/8tMLC7qW2UsssTAausZNTD</div>
+      <div class="link-desc">Prompts de ejemplo con estructura ICFR completa para cada misión — referencia para estudiantes</div>
+    </div>
+  </div>
+</div>
+
+</body></html>

@@ -1,0 +1,493 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Ejemplos ICFR — 11 Misiones</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Bebas+Neue&display=swap">
+
+<style>
+:root {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --border: #334155;
+  --fg: #e2e8f0;
+  --fg-dim: #94a3b8;
+  --gold: #f5c842;
+  --accent: #3b82f6;
+  --success: #22c55e;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #f8fafc; --surface: #ffffff; --border: #e2e8f0;
+    --fg: #0f172a; --fg-dim: #64748b;
+    color-scheme: light;
+  }
+}
+:root[data-theme="dark"] { color-scheme: dark; }
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body);
+  padding: 24px max(16px, env(safe-area-inset-left,0px));
+  padding-right: max(16px, env(safe-area-inset-right,0px));
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  color: var(--gold);
+  letter-spacing: .06em;
+  margin-bottom: 4px;
+}
+.subtitle {
+  font-size: .8rem; color: var(--fg-dim);
+  letter-spacing: .1em; text-transform: uppercase;
+  margin-bottom: 32px;
+}
+
+.mission-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.mission-header {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 16px;
+}
+.mission-emoji {
+  font-size: 1.8rem;
+  width: 48px; height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.mission-title {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  letter-spacing: .05em;
+}
+.mission-topic {
+  font-size: .75rem; color: var(--fg-dim);
+  letter-spacing: .1em; text-transform: uppercase;
+}
+
+.prompt-block {
+  background: rgba(0,0,0,.2);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  font-size: .88rem;
+  line-height: 1.6;
+}
+.prompt-block .tag {
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.output-block {
+  background: rgba(34,197,94,.07);
+  border-left: 3px solid var(--success);
+  border-radius: 0 8px 8px 0;
+  padding: 14px 16px;
+  font-size: .85rem;
+  line-height: 1.65;
+  color: var(--fg-dim);
+}
+.output-label {
+  font-size: .7rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--success);
+  font-weight: 700; margin-bottom: 6px;
+}
+.prompt-label {
+  font-size: .7rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--accent);
+  font-weight: 700; margin-bottom: 6px;
+}
+
+.score-bar {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  margin-top: 14px;
+}
+.score-pill {
+  font-size: .75rem; font-weight: 700;
+  padding: 3px 10px; border-radius: 20px;
+  background: var(--border);
+}
+.medal { font-size: .9rem; }
+</style>
+
+<h1>🏆 Ejemplos ICFR — 11 Misiones</h1>
+<div class="subtitle">Torneo de Prompting · ADSO 228118 · SENA CDMC Itagüí</div>
+
+<!-- MISIÓN 1 -->
+<div class="mission-card">
+  <div class="mission-header">
+    <div class="mission-emoji" style="background:#f59e0b22;">🛒</div>
+    <div>
+      <div class="mission-title">Misión 1 — El Mercado Imposible</div>
+      <div class="mission-topic">Finanzas Familiares</div>
+    </div>
+  </div>
+  <div class="prompt-label">Prompt estructurado</div>
+  <div class="prompt-block">
+    <span class="tag">[I]</span> Elabora un plan de compras semanal de mercado para una familia colombiana de 4 personas con un presupuesto máximo de $150.000 pesos.<br>
+    <span class="tag">[C]</span> Eres un nutricionista y asesor financiero colombiano con experiencia en economía del hogar de estratos 1 y 2.<br>
+    <span class="tag">[F]</span> Presenta una tabla con: categoría, producto, cantidad, precio unitario y precio total. Al final incluye el resumen del gasto total y el ahorro.<br>
+    <span class="tag">[R]</span> No incluyas productos de marca premium ni importados. Todos los precios deben ser realistas para mercados populares como Éxito Express o plazas de mercado en Medellín.
+  </div>
+  <div class="output-label">Salida del LLM (fragmento)</div>
+  <div class="output-block">
+    Plan de mercado semanal — Familia 4 personas / $150.000<br><br>
+    | Categoría | Producto | Cantidad | P. Unit | Total |<br>
+    | Proteína | Huevos AA | 30 und | $550 | $16.500 |<br>
+    | Proteína | Pechuga pollo | 1 kg | $12.000 | $12.000 |<br>
+    | Lácteos | Leche bolsa | 6 und | $2.200 | $13.200 |<br>
+    | Verduras | Papa criolla | 2 kg | $3.500 | $7.000 |<br>
+    | Verduras | Tomate chonto | 1 kg | $4.000 | $4.000 |<br>
+    | Cereales | Arroz blanco | 3 kg | $4.800 | $14.400 |<br>
+    | Legumbres | Frijol cargamanto | 1 kg | $7.500 | $7.500 |<br>
+    ... Total: $142.300 · Ahorro: $7.700
+  </div>
+  <div class="score-bar">
+    <span class="score-pill">I: 20/20</span>
+    <span class="score-pill">C: 20/20</span>
+    <span class="score-pill">F: 20/20</span>
+    <span class="score-pill">R: 38/40</span>
+    <span class="score-pill">Total: 98</span>
+    <span class="medal">🥇 Oro</span>
+  </div>
+</div>
+
+<!-- MISIÓN 2 -->
+<div class="mission-card">
+  <div class="mission-header">
+    <div class="mission-emoji" style="background:#ef444422;">🍰</div>
+    <div>
+      <div class="mission-title">Misión 2 — Salvar el Negocio</div>
+      <div class="mission-topic">Atención y Crisis en Redes</div>
+    </div>
+  </div>
+  <div class="prompt-label">Prompt estructurado</div>
+  <div class="prompt-block">
+    <span class="tag">[I]</span> Redacta una respuesta pública en redes sociales para una pastelería que recibió una reseña negativa viral acusando al negocio de vender tortas vencidas.<br>
+    <span class="tag">[C]</span> Eres el community manager de la pastelería "Dulce Antojo" en Itagüí, con experiencia en manejo de crisis digitales para pymes colombianas.<br>
+    <span class="tag">[F]</span> Respuesta de máximo 5 oraciones, tono empático y profesional, apta para publicar como comentario en Instagram.<br>
+    <span class="tag">[R]</span> No uses lenguaje defensivo ni acuses al cliente de mentir. No ofrezcas descuentos ni compensaciones económicas en la respuesta pública.
+  </div>
+  <div class="output-label">Salida del LLM (fragmento)</div>
+  <div class="output-block">
+    Hola [nombre del cliente], lamentamos profundamente tu experiencia y entendemos tu preocupación. En Dulce Antojo nuestra prioridad es la calidad y la seguridad de cada producto que sale de nuestra cocina. Revisamos nuestros procesos de control de calidad diariamente y tomamos muy en serio cada comentario de nuestros clientes. Te invitamos a comunicarte con nosotros de forma directa al DM para entender mejor lo que ocurrió y encontrar juntos la mejor solución. Gracias por darnos la oportunidad de mejorar. 🙏
+  </div>
+  <div class="score-bar">
+    <span class="score-pill">I: 20/20</span>
+    <span class="score-pill">C: 20/20</span>
+    <span class="score-pill">F: 18/20</span>
+    <span class="score-pill">R: 40/40</span>
+    <span class="medal">🥇 Oro</span>
+  </div>
+</div>
+
+<!-- MISIÓN 3 -->
+<div class="mission-card">
+  <div class="mission-header">
+    <div class="mission-emoji" style="background:#8b5cf622;">🤝</div>
+    <div>
+      <div class="mission-title">Misión 3 — La Conversación Incómoda</div>
+      <div class="mission-topic">Habilidades Blandas y Liderazgo</div>
+    </div>
+  </div>
+  <div class="prompt-label">Prompt estructurado</div>
+  <div class="prompt-block">
+    <span class="tag">[I]</span> Escribe un guión de conversación para darle retroalimentación negativa a un compañero de equipo que llega tarde y afecta el rendimiento del grupo.<br>
+    <span class="tag">[C]</span> Eres un líder de equipo en una empresa de desarrollo de software en Medellín. Tu compañero tiene buen desempeño técnico pero problemas de puntualidad.<br>
+    <span class="tag">[F]</span> Guión en formato diálogo con 4 turnos de conversación, usando la técnica de retroalimentación tipo sándwich (positivo-negativo-positivo).<br>
+    <span class="tag">[R]</span> No uses lenguaje autoritario ni amenazas de despido. La conversación debe darse en privado y mantener la dignidad del compañero.
+  </div>
+  <div class="output-label">Salida del LLM (fragmento)</div>
+  <div class="output-block">
+    Líder: "Andrés, gracias por tomarte el tiempo. Quiero empezar diciéndote que tu trabajo técnico ha sido excelente este sprint, especialmente en la integración del módulo de pagos."<br>
+    Andrés: "Gracias, estoy comprometido con el proyecto."<br>
+    Líder: "Precisamente por eso quiero hablarte de algo que nos está afectando como equipo: los últimos días has llegado después de las 9am y eso retrasa nuestras reuniones de inicio. ¿Hay algo que esté pasando que podamos resolver juntos?"<br>
+    Andrés: "Tienes razón, he tenido problemas con el transporte. Puedo ajustar mi horario."<br>
+    Líder: "Me parece bien. Sé que eres una persona responsable y confío en que podemos encontrar una solución. ¿Qué te parece si lo intentamos esta semana y lo revisamos el viernes?"
+  </div>
+  <div class="score-bar">
+    <span class="score-pill">I: 20/20</span>
+    <span class="score-pill">C: 20/20</span>
+    <span class="score-pill">F: 20/20</span>
+    <span class="score-pill">R: 38/40</span>
+    <span class="medal">🥇 Oro</span>
+  </div>
+</div>
+
+<!-- MISIÓN 4 -->
+<div class="mission-card">
+  <div class="mission-header">
+    <div class="mission-emoji" style="background:#10b98122;">💪</div>
+    <div>
+      <div class="mission-title">Misión 4 — Entrenar sin Lesión</div>
+      <div class="mission-topic">Salud Ocupacional y Bienestar</div>
+    </div>
+  </div>
+  <div class="prompt-label">Prompt estructurado</div>
+  <div class="prompt-block">
+    <span class="tag">[I]</span> Diseña una rutina de pausas activas de 10 minutos para trabajadores que pasan más de 6 horas sentados frente a un computador.<br>
+    <span class="tag">[C]</span> Eres un fisioterapeuta colombiano especializado en salud ocupacional con experiencia en empresas de tecnología.<br>
+    <span class="tag">[F]</span> Lista numerada de 5 ejercicios con nombre del ejercicio, duración, descripción breve de la posición y beneficio principal.<br>
+    <span class="tag">[R]</span> Los ejercicios deben realizarse de pie o sentado en la silla, sin necesidad de colchoneta ni implementos deportivos. No incluyas ejercicios que requieran acostarse.
+  </div>
+  <div class="output-label">Salida del LLM (fragmento)</div>
+  <div class="output-block">
+    1. Rotación de cuello — 1 min — Sentado, gira lentamente la cabeza de lado a lado — Alivia tensión cervical.<br>
+    2. Estiramiento de trapecio — 2 min — De pie, lleva la oreja al hombro sosteniéndolo con la mano — Reduce contracturas.<br>
+    3. Apertura de pecho — 2 min — De pie, entrelaza manos detrás y abre el pecho — Contrarresta postura encorvada.<br>
+    4. Sentadilla en silla — 3 min — Levántate y siéntate lentamente 10 veces — Activa circulación en piernas.<br>
+    5. Estiramiento de muñecas — 2 min — Extiende el brazo y dobla la mano hacia arriba/abajo — Previene túnel carpiano.
+  </div>
+  <div class="score-bar">
+    <span class="score-pill">I: 20/20</span>
+    <span class="score-pill">C: 20/20</span>
+    <span class="score-pill">F: 20/20</span>
+    <span class="score-pill">R: 40/40</span>
+    <span class="medal">🥇 Oro</span>
+  </div>
+</div>
+
+<!-- MISIÓN 5 -->
+<div class="mission-card">
+  <div class="mission-header">
+    <div class="mission-emoji" style="background:#3b82f622;">📸</div>
+    <div>
+      <div class="mission-title">Misión 5 — Llenar el Taller con Celular</div>
+      <div class="mission-topic">Marketing y Contenido Digital</div>
+    </div>
+  </div>
+  <div class="prompt-label">Prompt estructurado</div>
+  <div class="prompt-block">
+    <span class="tag">[I]</span> Crea un plan de contenido para Instagram de una semana para un taller de mecánica automotriz en Itagüí que quiere atraer nuevos clientes.<br>
+    <span class="tag">[C]</span> Eres un experto en marketing digital para pymes colombianas con enfoque en negocios de servicios automotrices.<br>
+    <span class="tag">[F]</span> Tabla con 7 días, cada uno con: tipo de publicación (Reel/Carrusel/Historia), tema del contenido, caption de máximo 2 líneas y hashtags relevantes.<br>
+    <span class="tag">[R]</span> No uses publicidad pagada ni herramientas de edición profesional. Todo debe poder hacerse con el celular del dueño del taller. No repitas el mismo tipo de publicación dos días seguidos.
+  </div>
+  <div class="output-label">Salida del LLM (fragmento)</div>
+  <div class="output-block">
+    Lunes | Reel | "Antes y después de un cambio de aceite" | ¿Cuándo fue tu último cambio? Tu motor te lo agradece 🔧 | #MecánicaItagüí #TallerMecánico<br>
+    Martes | Historia | "Consejo del día: señales de frenos en mal estado" | Encuesta: ¿Sabes cuándo cambiar tus frenos? | #ConsejoMecánico<br>
+    Miércoles | Carrusel | "5 errores que arruinan tu carro sin que lo sepas" | Desliza y descubre si estás cometiendo alguno 👇 | #CuidaTuCarro...
+  </div>
+  <div class="score-bar">
+    <span class="score-pill">I: 20/20</span>
+    <span class="score-pill">C: 20/20</span>
+    <span class="score-pill">F: 20/20</span>
+    <span class="score-pill">R: 36/40</span>
+    <span class="medal">🥇 Oro</span>
+  </div>
+</div>
+
+<!-- MISIÓN 6 -->
+<div class="mission-card">
+  <div class="mission-header">
+    <div class="mission-emoji" style="background:#f9731622;">🏢</div>
+    <div>
+      <div class="mission-title">Misión 6 — Carta al Vecino Ruidoso</div>
+      <div class="mission-topic">Convivencia Ciudadana</div>
+    </div>
+  </div>
+  <div class="prompt-label">Prompt estructurado</div>
+  <div class="prompt-block">
+    <span class="tag">[I]</span> Redacta una carta formal dirigida a un vecino que hace ruido excesivo en horas de descanso nocturno en un conjunto residencial.<br>
+    <span class="tag">[C]</span> Eres un abogado colombiano especializado en propiedad horizontal y convivencia ciudadana, redactando en nombre del Consejo de Administración del conjunto.<br>
+    <span class="tag">[F]</span> Carta formal con encabezado, saludo, tres párrafos (descripción del problema, norma legal aplicable, solicitud formal) y despedida institucional.<br>
+    <span class="tag">[R]</span> No uses lenguaje agresivo ni amenazas directas de demanda. Cita únicamente la Ley 675 de 2001 como referencia legal. No menciones multas económicas específicas.
+  </div>
+  <div class="output-label">Salida del LLM (fragmento)</div>
+  <div class="output-block">
+    Itagüí, noviembre de 2026<br>
+    Señor/Señora [Nombre Propietario]<br>
+    Apto [número] — Conjunto Residencial [nombre]<br><br>
+    Respetado/a vecino/a:<br>
+    El Consejo de Administración se ha recibido múltiples reportes de residentes sobre ruidos provenientes de su unidad privada en horario nocturno, específicamente entre las 10:00 p.m. y las 6:00 a.m...<br>
+    La Ley 675 de 2001, que regula el régimen de propiedad horizontal en Colombia, establece en su artículo 18 la obligación de cada propietario de abstenerse de ejecutar actos que perturben la tranquilidad de los demás residentes...<br>
+    En consecuencia, respetuosamente solicitamos ajustar los niveles de ruido dentro de los horarios permitidos por la normativa vigente, con el fin de preservar la convivencia armoniosa de nuestra comunidad.
+  </div>
+  <div class="score-bar">
+    <span class="score-pill">I: 20/20</span>
+    <span class="score-pill">C: 20/20</span>
+    <span class="score-pill">F: 20/20</span>
+    <span class="score-pill">R: 40/40</span>
+    <span class="medal">🥇 Oro</span>
+  </div>
+</div>
+
+<!-- MISIÓN 7 -->
+<div class="mission-card">
+  <div class="mission-header">
+    <div class="mission-emoji" style="background:#06b6d422;">🎒</div>
+    <div>
+      <div class="mission-title">Misión 7 — Fin de Semana Mochilero</div>
+      <div class="mission-topic">Turismo Local y Aventura</div>
+    </div>
+  </div>
+  <div class="prompt-label">Prompt estructurado</div>
+  <div class="prompt-block">
+    <span class="tag">[I]</span> Planifica un itinerario de fin de semana de bajo presupuesto para dos personas que quieren hacer turismo desde Medellín sin salir de Antioquia.<br>
+    <span class="tag">[C]</span> Eres un guía de turismo colombiano especializado en ecoturismo y viajes de bajo costo en el Departamento de Antioquia.<br>
+    <span class="tag">[F]</span> Itinerario día por día (sábado y domingo) con horarios, actividades, lugar de comida y costo estimado por persona. Al final el presupuesto total estimado.<br>
+    <span class="tag">[R]</span> El presupuesto total no debe superar $200.000 por persona incluyendo transporte. No incluyas hoteles de cadena ni restaurantes de precio alto. Solo transporte público o colectivo.
+  </div>
+  <div class="output-label">Salida del LLM (fragmento)</div>
+  <div class="output-block">
+    SÁBADO — Destino: Jardín, Antioquia<br>
+    6:00 am — Bus desde Terminal del Sur ($18.000 ida) | 9:30 am — Llegada, desayuno en plaza ($8.000) | 10:00 am — Recorrido a pie por el pueblo patrimonial (gratis) | 12:30 pm — Almuerzo típico en fonda local ($12.000) | 2:00 pm — Cascada La Escalera — entrada $5.000 | 6:00 pm — Regreso a Medellín ($18.000)<br><br>
+    DOMINGO — Destino: Guatapé<br>
+    7:00 am — Bus desde Norte ($15.000 ida/vuelta) | 10:00 am — Subida La Piedra ($25.000) | 1:00 pm — Almuerzo orilla embalse ($15.000)...<br>
+    Total estimado por persona: $182.000
+  </div>
+  <div class="score-bar">
+    <span class="score-pill">I: 20/20</span>
+    <span class="score-pill">C: 20/20</span>
+    <span class="score-pill">F: 20/20</span>
+    <span class="score-pill">R: 38/40</span>
+    <span class="medal">🥇 Oro</span>
+  </div>
+</div>
+
+<!-- MISIÓN 8 -->
+<div class="mission-card">
+  <div class="mission-header">
+    <div class="mission-emoji" style="background:#ec489922;">💼</div>
+    <div>
+      <div class="mission-title">Misión 8 — Giro Laboral a los 42</div>
+      <div class="mission-topic">Orientación y Reubicación Laboral</div>
+    </div>
+  </div>
+  <div class="prompt-label">Prompt estructurado</div>
+  <div class="prompt-block">
+    <span class="tag">[I]</span> Elabora un plan de reconversión laboral para una persona de 42 años que trabajó toda su vida como operario de manufactura y quiere cambiar al sector tecnológico.<br>
+    <span class="tag">[C]</span> Eres un orientador vocacional y coach laboral colombiano con experiencia en programas de reconversión para trabajadores del sector industrial en Antioquia.<br>
+    <span class="tag">[F]</span> Plan estructurado en 3 fases (3 meses cada una) con: objetivo de la fase, actividades concretas y recursos gratuitos o de bajo costo disponibles en Colombia.<br>
+    <span class="tag">[R]</span> Solo incluye rutas de formación gratuitas o con costo máximo de $500.000 totales. No sugieras carreras universitarias de 4 años ni programas fuera de Colombia.
+  </div>
+  <div class="output-label">Salida del LLM (fragmento)</div>
+  <div class="output-block">
+    Fase 1 (Meses 1-3): Exploración y base digital<br>
+    Objetivo: Desarrollar competencias digitales básicas y descubrir el área tecnológica de mayor afinidad.<br>
+    Actividades: Curso "Fundamentos de TI" en Google (gratuito, certificado) | Curso introductorio de Python en SENA Virtual (gratuito) | Participar en comunidades tecnológicas locales en LinkedIn.<br><br>
+    Fase 2 (Meses 4-6): Especialización<br>
+    Objetivo: Profundizar en un área específica (soporte técnico, datos o desarrollo web).<br>
+    Actividades: Tecnólogo SENA en ADSO o Análisis de Datos (gratuito) | Plataforma Coursera con beca Google...
+  </div>
+  <div class="score-bar">
+    <span class="score-pill">I: 20/20</span>
+    <span class="score-pill">C: 20/20</span>
+    <span class="score-pill">F: 20/20</span>
+    <span class="score-pill">R: 38/40</span>
+    <span class="medal">🥇 Oro</span>
+  </div>
+</div>
+
+<!-- MISIÓN 9 -->
+<div class="mission-card">
+  <div class="mission-header">
+    <div class="mission-emoji" style="background:#6366f122;">📋</div>
+    <div>
+      <div class="mission-title">Misión 9 — Renegociar la Deuda Bancaria</div>
+      <div class="mission-topic">Asesoría Legal y Financiera</div>
+    </div>
+  </div>
+  <div class="prompt-label">Prompt estructurado</div>
+  <div class="prompt-block">
+    <span class="tag">[I]</span> Redacta una carta de solicitud de reestructuración de deuda dirigida a una entidad bancaria colombiana por parte de un cliente que perdió su empleo.<br>
+    <span class="tag">[C]</span> Eres un abogado financiero colombiano que asesora a personas naturales en situaciones de sobreendeudamiento y trámites ante entidades del sistema financiero.<br>
+    <span class="tag">[F]</span> Carta formal con: datos del solicitante (ficticios), descripción de la situación, solicitud específica de período de gracia de 3 meses, y propuesta de nuevo plan de pago.<br>
+    <span class="tag">[R]</span> No uses términos de insolvencia ni quiebra. No menciones acciones legales contra el banco. La carta debe ser respetuosa y orientada a una solución negociada.
+  </div>
+  <div class="output-label">Salida del LLM (fragmento)</div>
+  <div class="output-block">
+    Medellín, 14 de noviembre de 2026<br>
+    Señor Gerente — Banco [nombre] — Sucursal Itagüí<br><br>
+    Yo, Carlos Andrés Mejía Restrepo, identificado con CC 71.XXX.XXX, cliente activo con crédito de libre inversión No. XXXX, me permito dirigirme respetuosamente a usted para solicitar una reestructuración de mi obligación crediticia.<br><br>
+    En el mes de septiembre del presente año, fui desvinculado de mi empresa por razones de reducción de personal, situación que ha afectado temporalmente mi capacidad de pago. Cuento con perspectivas reales de reincorporación laboral en los próximos 90 días...<br>
+    Solicito respetuosamente un período de gracia de 3 meses en el pago del capital, manteniendo el pago de intereses, y la extensión del plazo en 6 meses adicionales.
+  </div>
+  <div class="score-bar">
+    <span class="score-pill">I: 20/20</span>
+    <span class="score-pill">C: 20/20</span>
+    <span class="score-pill">F: 20/20</span>
+    <span class="score-pill">R: 40/40</span>
+    <span class="medal">🥇 Oro</span>
+  </div>
+</div>
+
+<!-- MISIÓN 10 -->
+<div class="mission-card">
+  <div class="mission-header">
+    <div class="mission-emoji" style="background:#84cc1622;">🐕</div>
+    <div>
+      <div class="mission-title">Misión 10 — Adopción del Perro Criollo</div>
+      <div class="mission-topic">Impacto Social y Comunitario</div>
+    </div>
+  </div>
+  <div class="prompt-label">Prompt estructurado</div>
+  <div class="prompt-block">
+    <span class="tag">[I]</span> Redacta una campaña de concientización para promover la adopción responsable de perros criollos en el municipio de Itagüí.<br>
+    <span class="tag">[C]</span> Eres un comunicador social colombiano especializado en bienestar animal y campañas comunitarias para gobiernos locales.<br>
+    <span class="tag">[F]</span> Texto con: título llamativo, 3 párrafos argumentativos y un llamado a la acción final con información de contacto ficticia. Máximo 250 palabras.<br>
+    <span class="tag">[R]</span> No menciones razas de perros con pedigrí ni hagas comparaciones con perros importados. No uses imágenes ni recursos visuales (solo texto). No menciones eutanasia.
+  </div>
+  <div class="output-label">Salida del LLM (fragmento)</div>
+  <div class="output-block">
+    🐾 EL AMOR NO TIENE RAZA — ADOPTA UN CRIOLLO EN ITAGÜÍ<br><br>
+    En las calles de nuestro municipio viven miles de perros criollos que esperan una oportunidad. Son animales resistentes, inteligentes y profundamente leales, adaptados naturalmente al clima y al ritmo de vida colombiano.<br><br>
+    Adoptar un perro criollo es un acto de responsabilidad social. Cada adopción libera espacio en los albergues municipales, reduce el número de animales en situación de calle y fortalece los lazos comunitarios de Itagüí. Además, los perros criollos suelen tener menos problemas de salud que las razas de cría intensiva.<br><br>
+    Únete a más de 500 familias itagüiseñas que ya eligieron dar una segunda oportunidad. Contáctanos: 📞 604-XXX-XXXX | 📧 bienestaranimal@itagui.gov.co | Lunes a viernes 8am–5pm.
+  </div>
+  <div class="score-bar">
+    <span class="score-pill">I: 20/20</span>
+    <span class="score-pill">C: 20/20</span>
+    <span class="score-pill">F: 20/20</span>
+    <span class="score-pill">R: 40/40</span>
+    <span class="medal">🥇 Oro</span>
+  </div>
+</div>
+
+<!-- MISIÓN 11 -->
+<div class="mission-card">
+  <div class="mission-header">
+    <div class="mission-emoji" style="background:#14b8a622;">🌳</div>
+    <div>
+      <div class="mission-title">Misión 11 — Recuperación del Parque</div>
+      <div class="mission-topic">Espacio Público y Tejido Barrial</div>
+    </div>
+  </div>
+  <div class="prompt-label">Prompt estructurado</div>
+  <div class="prompt-block">
+    <span class="tag">[I]</span> Elabora una propuesta ciudadana para recuperar un parque barrial abandonado y convertirlo en un espacio cultural y recreativo para la comunidad.<br>
+    <span class="tag">[C]</span> Eres un gestor cultural y líder comunitario de un barrio popular de Itagüí con experiencia en proyectos de urbanismo participativo y convivencia barrial.<br>
+    <span class="tag">[F]</span> Propuesta estructurada con: diagnóstico del problema (2 párrafos), solución propuesta con 4 actividades concretas, actores involucrados y beneficios esperados.<br>
+    <span class="tag">[R]</span> No propongas inversión económica privada ni patrocinio de marcas comerciales. Las actividades deben poder realizarse con gestión comunitaria y apoyo institucional del municipio. No propongas demoler estructuras existentes.
+  </div>
+  <div class="output-label">Salida del LLM (fragmento)</div>
+  <div class="output-block">
+    Diagnóstico: El Parque La Esperanza, ubicado en el barrio Santa María de Itagüí, lleva más de 3 años en abandono. La falta de mantenimiento ha convertido este espacio en un foco de inseguridad, con luminarias dañadas y zonas verdes deterioradas que impiden su uso por parte de niños, jóvenes y adultos mayores...<br><br>
+    Propuesta — Actividades:<br>
+    1. Minga comunitaria de limpieza y pintura — organizada por la JAC con apoyo de la Alcaldía.<br>
+    2. Programa de huertas urbanas comunitarias — parcelas asignadas a familias del barrio.<br>
+    3. Ciclo de cine al aire libre mensual — gestionado con la Casa de la Cultura de Itagüí.<br>
+    4. Escuela de artes urbanas para jóvenes — alianza con el SENA CDMC.<br><br>
+    Actores: JAC, Alcaldía de Itagüí, SENA, comunidad organizada.
+  </div>
+  <div class="score-bar">
+    <span class="score-pill">I: 20/20</span>
+    <span class="score-pill">C: 20/20</span>
+    <span class="score-pill">F: 20/20</span>
+    <span class="score-pill">R: 38/40</span>
+    <span class="medal">🥇 Oro</span>
+  </div>
+</div>
+
+</body></html>

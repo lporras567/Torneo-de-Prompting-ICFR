@@ -1,0 +1,385 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Tarjetas de Misión · Torneo ICFR</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;900&display=swap">
+
+<style>
+:root {
+  --bg: #ffffff;
+  --fg: #0f172a;
+  --fg-dim: #475569;
+  --gold: #b45309;
+  --border: #e2e8f0;
+  --surface: #f8fafc;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0f172a; --fg: #f1f5f9; --fg-dim: #94a3b8;
+    --gold: #f59e0b; --border: #1e293b; --surface: #1e293b;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0f172a; --fg: #f1f5f9; --fg-dim: #94a3b8;
+  --gold: #f59e0b; --border: #1e293b; --surface: #1e293b;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Inter', sans-serif;
+  padding: env(safe-area-inset-top,0px) max(16px,env(safe-area-inset-right,0px)) env(safe-area-inset-bottom,0px) max(16px,env(safe-area-inset-left,0px));
+}
+
+/* ── CONTROLES PANTALLA ── */
+#controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-block: 18px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.5rem;
+  letter-spacing: .08em;
+  color: var(--gold);
+}
+.subtitle { font-size: .75rem; color: var(--fg-dim); letter-spacing: .1em; text-transform: uppercase; }
+.print-btn {
+  background: var(--gold);
+  color: #fff;
+  border: none;
+  padding: 10px 28px;
+  border-radius: 8px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.1rem;
+  letter-spacing: .1em;
+  cursor: pointer;
+  transition: opacity .2s;
+}
+.print-btn:hover { opacity: .85; }
+.hint { font-size: .72rem; color: var(--fg-dim); max-width: 280px; line-height: 1.5; }
+
+/* ── REJILLA DE TARJETAS (pantalla) ── */
+#cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  padding-block: 28px;
+}
+
+/* ── TARJETA ── */
+.card {
+  border-radius: 16px;
+  border: 2px solid var(--border);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  break-inside: avoid;
+}
+
+.card-header {
+  padding: 20px 22px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-bottom: 2px solid;
+  position: relative;
+}
+.card-num {
+  font-size: .65rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  opacity: .7;
+  font-weight: 600;
+}
+.card-emoji { font-size: 2rem; line-height: 1; }
+.card-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.6rem;
+  letter-spacing: .04em;
+  line-height: 1.05;
+}
+.card-topic {
+  display: inline-block;
+  font-size: .65rem;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: rgba(255,255,255,.18);
+  color: inherit;
+  width: fit-content;
+}
+
+.card-body { padding: 18px 22px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+
+.section-label {
+  font-size: .6rem;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+  font-weight: 700;
+  color: var(--fg-dim);
+  margin-bottom: 4px;
+}
+.problem-text {
+  font-size: .82rem;
+  line-height: 1.65;
+  color: var(--fg);
+}
+
+.restriction-box {
+  background: #fef2f2;
+  border: 1.5px solid #fca5a5;
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+:root[data-theme="dark"] .restriction-box,
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .restriction-box { background: #1a0a0a; border-color: #7f1d1d; }
+}
+.restriction-label {
+  font-size: .6rem;
+  font-weight: 900;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: #dc2626;
+}
+.restriction-text {
+  font-size: .78rem;
+  line-height: 1.6;
+  color: #991b1b;
+}
+:root[data-theme="dark"] .restriction-text { color: #fca5a5; }
+
+.limit-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+.limit-text {
+  font-size: .78rem;
+  line-height: 1.5;
+  color: var(--fg-dim);
+}
+
+/* ── RUBRICA ICFR (pie de tarjeta) ── */
+.rubric {
+  border-top: 1px solid var(--border);
+  padding: 12px 22px;
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 4px;
+  background: var(--surface);
+}
+.rubric-item { text-align: center; }
+.rubric-key {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1rem;
+  letter-spacing: .06em;
+}
+.rubric-pts {
+  font-size: .62rem;
+  color: var(--fg-dim);
+  font-weight: 600;
+}
+.rubric-name { font-size: .55rem; color: var(--fg-dim); text-transform: uppercase; letter-spacing: .1em; }
+
+/* ── IMPRESIÓN ── */
+@media print {
+  :root { color-scheme: light; --bg:#fff; --fg:#0f172a; --fg-dim:#475569; --gold:#b45309; --border:#e2e8f0; --surface:#f8fafc; }
+  #controls { display: none; }
+  body { padding: 0; }
+  #cards-grid {
+    display: block;
+    padding: 0;
+  }
+  .card {
+    width: 100%;
+    page-break-after: always;
+    break-after: page;
+    border-radius: 0;
+    border: none;
+    margin: 0;
+    min-height: 26cm;
+    justify-content: space-between;
+  }
+  .card-header { padding: 28px 32px 22px; }
+  .card-emoji { font-size: 2.8rem; }
+  .card-title { font-size: 2.2rem; }
+  .card-body { padding: 22px 32px; gap: 18px; }
+  .problem-text { font-size: .9rem; }
+  .restriction-box { padding: 14px 18px; }
+  .restriction-text { font-size: .88rem; color: #7f1d1d; }
+  .limit-text { font-size: .85rem; }
+  .rubric { padding: 16px 32px; }
+  .rubric-key { font-size: 1.3rem; }
+  .rubric-pts { font-size: .72rem; }
+}
+</style>
+
+<!-- CONTROLES -->
+<div id="controls">
+  <div>
+    <div class="logo">🏆 Torneo de Prompting ICFR</div>
+    <div class="subtitle">Hackatón · La Restricción Blindada · 11 Misiones</div>
+  </div>
+  <div class="hint">Imprime esta página (Ctrl+P) para obtener una tarjeta por hoja A4. Cada equipo recibe la tarjeta de su misión asignada.</div>
+  <button class="print-btn" onclick="window.print()">🖨 Imprimir Tarjetas</button>
+</div>
+
+<!-- TARJETAS -->
+<div id="cards-grid"></div>
+
+<script>
+const MISSIONS = [
+  {
+    id:1, emoji:"🛒", name:"El Mercado Imposible", topic:"Finanzas Familiares",
+    color:"#d97706", headerBg:"#fffbeb", headerFg:"#78350f",
+    problem:"Una familia de 3 personas en Medellín dispone de $150.000 COP para almuerzos y cenas de lunes a viernes. Solo tienen acceso a tienda de barrio o plaza de mercado local. Sin tiempo para preparaciones de más de 45 minutos.",
+    restriction:"Sin salmón, mariscos ni cortes de carne finos. Ninguna receta que supere 45 min de preparación. Presupuesto inamovible: máximo $150.000 COP para los 5 días.",
+    limit:"Tabla menú 5 días (almuerzo + cena) + lista de compras con cantidades y costos estimados."
+  },
+  {
+    id:2, emoji:"🍰", name:"Salvar el Negocio", topic:"Atención y Crisis en Redes",
+    color:"#dc2626", headerBg:"#fef2f2", headerFg:"#7f1d1d",
+    problem:"Una repostería artesanal entregó una torta con 40 min de retraso y la cobertura llegó corrida. El cliente exige reembolso del 100% por WhatsApp y amenaza con destruir la reputación en redes sociales. Devolver todo genera pérdidas graves al negocio.",
+    restriction:"Prohibido culpar al domiciliario, al tráfico o a causas externas. Sin tecnicismos jurídicos. Sin sonar a respuesta automática de call center.",
+    limit:"3 párrafos cortos, máximo 120 palabras en total, tono empático y humano."
+  },
+  {
+    id:3, emoji:"🤝", name:"La Conversación Incómoda", topic:"Habilidades Blandas",
+    color:"#7c3aed", headerBg:"#f5f3ff", headerFg:"#4c1d95",
+    problem:"Un compañero entrega trabajo técnico de alta calidad, pero en 2 semanas ha retrasado las planillas de inventario 2 días, deteniendo los despachos matutinos y afectando las métricas grupales. Se requiere una conversación presencial hoy.",
+    restriction:"Prohibidas las palabras absolutas ('siempre', 'nunca'). Prohibidos los adjetivos que califiquen la personalidad ('irresponsable', 'descuidado', 'flojo'). Sin amenazas.",
+    limit:"Guion de 3 pasos: Hecho observable → Impacto operativo → Pregunta abierta. Máximo 150 palabras."
+  },
+  {
+    id:4, emoji:"💪", name:"Entrenar sin Lesión", topic:"Salud Ocupacional y Bienestar",
+    color:"#059669", headerBg:"#ecfdf5", headerFg:"#064e3b",
+    problem:"Usuario de 30 años, empleo sedentario, más de 2 años sin actividad física regular, con molestia lumbar baja. Desea iniciar rutina de entrenamiento en casa, 4 días por semana. Sin presupuesto para gimnasio, sin pesas ni máquinas.",
+    restriction:"Cero ejercicios de alto impacto (burpees, saltos de cuerda, box jumps). Cero cargas axiales sobre la columna. Solo peso corporal o bandas elásticas.",
+    limit:"Tabla de 4 columnas: Día / Ejercicio / Series-Repeticiones / Descanso. Una tabla por día."
+  },
+  {
+    id:5, emoji:"📸", name:"Llenar el Taller con Celular", topic:"Marketing Digital",
+    color:"#2563eb", headerBg:"#eff6ff", headerFg:"#1e3a8a",
+    problem:"Fotógrafo independiente organiza taller de fotografía urbana para personas que solo tienen celular. Faltan 4 días y quedan 10 cupos sin vender. Necesita campaña en Instagram: un carrusel educativo, un reel y un post estático.",
+    restriction:"Sin tecnicismos avanzados (ISO, diafragma, RAW, bokeh). Sin referencias a cámaras réflex o equipos profesionales. Máximo 2 emojis por publicación.",
+    limit:"3 piezas completas (gancho + cuerpo + CTA + hashtags). Máximo 60 palabras cada una."
+  },
+  {
+    id:6, emoji:"🏢", name:"Carta al Vecino Ruidoso", topic:"Convivencia Ciudadana",
+    color:"#ea580c", headerBg:"#fff7ed", headerFg:"#7c2d12",
+    problem:"El vecino del piso superior pone música alta hasta las 2 a.m. los jueves y viernes. Su mascota ladra sola durante el día. Los reclamos verbales anteriores derivaron en discusiones acaloradas. Se necesita carta bajo la puerta antes de acudir a instancias policivas.",
+    restriction:"Sin adjetivos ofensivos ('desconsiderado', 'mal vecino', 'insolente'). Sin amenazas jurídicas inmediatas. Sin tono sarcástico. Enfoque exclusivamente de mediación pacífica.",
+    limit:"Carta formal, máximo 130 palabras."
+  },
+  {
+    id:7, emoji:"🎒", name:"Fin de Semana Mochilero", topic:"Turismo Local y Aventura",
+    color:"#0891b2", headerBg:"#ecfeff", headerFg:"#164e63",
+    problem:"Una pareja de jóvenes quiere escaparse de Medellín el sábado y regresar el domingo. Destinos posibles: Guatapé, Santa Fe de Antioquia o Jardín. Sin vehículo propio. Presupuesto TOTAL para ambos: $250.000 COP (transporte + alimentación + hospedaje).",
+    restriction:"Sin hoteles boutique ni resorts. Sin taxis ni apps de movilidad privada (Uber, InDrive). Sin tours cotizados en dólares. Ningún gasto puede superar los $250.000 COP en total.",
+    limit:"Itinerario hora a hora + tabla de presupuesto desglosada por ítem con costos exactos."
+  },
+  {
+    id:8, emoji:"💼", name:"Giro Laboral a los 42", topic:"Orientación y Reubicación Laboral",
+    color:"#db2777", headerBg:"#fdf2f8", headerFg:"#831843",
+    problem:"Mujer de 42 años, cajera por 18 años en supermercado. El médico le exige abandonar labores de pie por várices y fatiga articular. Quiere migrar a tareas administrativas o soporte digital remoto. Sin título universitario y sin recursos económicos para formarse.",
+    restriction:"Sin carreras universitarias largas (más de 2 años). Sin cursos con suscripción de pago. Sin tecnicismos en inglés sin explicar. Solo plataformas públicas y gratuitas (SENA, Google Actívate, Coursera becado).",
+    limit:"Plan de reconversión laboral a 6 meses, dividido en etapas con habilidades transferibles identificadas."
+  },
+  {
+    id:9, emoji:"📋", name:"Renegociar la Deuda Bancaria", topic:"Asesoría Legal y Financiera",
+    color:"#4f46e5", headerBg:"#eef2ff", headerFg:"#312e81",
+    problem:"Ciudadano colombiano con $4.500.000 COP en deuda de tarjeta de crédito, 60 días en mora. Capacidad de pago real: máximo $200.000 COP al mes. Las casas de cobranza lo acosan telefónicamente. Necesita propuesta formal de acuerdo de pago ante el banco.",
+    restriction:"Sin tono suplicante ni dramático. Sin prometer cuotas mayores a $200.000 COP. Sin cláusulas aceleratorias que beneficien al banco. Debe incluir cita de los derechos del consumidor financiero colombiano (Ley 1328/2009).",
+    limit:"Derecho de petición formal, máximo 1 página tamaño carta (aprox. 400 palabras)."
+  },
+  {
+    id:10, emoji:"🐕", name:"Adopción del Perro Criollo", topic:"Impacto Social y Comunitario",
+    color:"#65a30d", headerBg:"#f7fee7", headerFg:"#365314",
+    problem:"Una fundación protectora tiene un perro mestizo adulto (4 años, tamaño mediano-grande) que lleva 8 meses sin adoptar porque las familias piden cachorros de raza pequeña. Se necesita publicación en redes que destaque sus virtudes y genere adopciones.",
+    restriction:"Sin chantaje emocional ni victimismo ('si no lo adoptan morirá'). Tono exclusivamente optimista y digno. Los requisitos de tenencia responsable deben caber en menos de 90 palabras.",
+    limit:"Una historia de presentación + ficha técnica del perro. Adaptada para Instagram y Facebook."
+  },
+  {
+    id:11, emoji:"🌳", name:"Recuperación del Parque", topic:"Espacio Público y Tejido Barrial",
+    color:"#0d9488", headerBg:"#f0fdfa", headerFg:"#134e4a",
+    problem:"El parque infantil del barrio tiene juegos deteriorados, bancas despintadas y escombros acumulados. La JAC quiere convocar a una jornada comunitaria dominical para aseo, pintura y siembra de plantas, con participación de vecinos y comerciantes del sector.",
+    restriction:"Prohibido solicitar dinero en efectivo. Sin reclamos políticos ni menciones partidistas. Sin lenguaje burocrático, distante o de 'comunicado oficial'.",
+    limit:"Volante/circular para entregar casa por casa. Máximo 100 palabras. Tono cercano y motivador."
+  }
+];
+
+const RUBRIC = [
+  { key:'[I]', name:'Instrucción', pts:'20 pts' },
+  { key:'[C]', name:'Contexto',    pts:'20 pts' },
+  { key:'[F]', name:'Formato',     pts:'20 pts' },
+  { key:'[R]', name:'Restricción', pts:'40 pts' },
+];
+
+function buildCard(m) {
+  const isDark = document.documentElement.dataset.theme === 'dark'
+    || (!document.documentElement.dataset.theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+  const headerBg = isDark ? '#1e293b' : m.headerBg;
+  const headerFg = isDark ? '#f1f5f9' : m.headerFg;
+  const topicBg  = isDark ? 'rgba(255,255,255,.08)' : 'rgba(0,0,0,.08)';
+
+  return `
+  <article class="card" style="border-color:${m.color}40">
+    <div class="card-header" style="background:${headerBg};border-color:${m.color};color:${headerFg}">
+      <div class="card-num">Misión ${m.id} de 11 · Torneo de Prompting ICFR</div>
+      <div class="card-emoji">${m.emoji}</div>
+      <div class="card-title">${m.name}</div>
+      <span class="card-topic" style="background:${topicBg}">${m.topic}</span>
+    </div>
+    <div class="card-body">
+      <div>
+        <div class="section-label">📋 Situación Problema</div>
+        <p class="problem-text">${m.problem}</p>
+      </div>
+      <div class="restriction-box">
+        <div class="restriction-label">⛔ Restricción [R] — Obligatoria</div>
+        <p class="restriction-text">${m.restriction}</p>
+      </div>
+      <div class="limit-box">
+        <div class="section-label">📐 Formato de Entrega Requerido [F]</div>
+        <p class="limit-text">${m.limit}</p>
+      </div>
+    </div>
+    <div class="rubric">
+      ${RUBRIC.map(r=>`
+      <div class="rubric-item">
+        <div class="rubric-key" style="color:${m.color}">${r.key}</div>
+        <div class="rubric-pts">${r.pts}</div>
+        <div class="rubric-name">${r.name}</div>
+      </div>`).join('')}
+    </div>
+  </article>`;
+}
+
+const grid = document.getElementById('cards-grid');
+grid.innerHTML = MISSIONS.map(buildCard).join('');
+
+// Re-render if theme changes
+const observer = new MutationObserver(() => { grid.innerHTML = MISSIONS.map(buildCard).join(''); });
+observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+</script>
+
+</body></html>
