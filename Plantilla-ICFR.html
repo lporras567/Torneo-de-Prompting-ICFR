@@ -1,0 +1,501 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Plantilla ICFR</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap">
+
+<style>
+/* ── Tokens ───────────────────────────────────────────────── */
+:root {
+  --bg:        #f8fafc;
+  --surface:   #ffffff;
+  --surface2:  #f1f5f9;
+  --border:    #e2e8f0;
+  --fg:        #0f172a;
+  --fg-dim:    #64748b;
+  --fg-xdim:   #94a3b8;
+
+  --i:   #2563eb; --i-bg:  #eff6ff; --i-border: #bfdbfe;
+  --c:   #7c3aed; --c-bg:  #f5f3ff; --c-border: #ddd6fe;
+  --f:   #0891b2; --f-bg:  #ecfeff; --f-border: #a5f3fc;
+  --r:   #b45309; --r-bg:  #fffbeb; --r-border: #fde68a;
+
+  --gold:   #d97706;
+  --score:  #0f172a;
+
+  --radius: 12px;
+  --font-head: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:       #0f172a; --surface:  #1e293b; --surface2: #263347;
+    --border:   #334155; --fg:       #e2e8f0; --fg-dim:   #94a3b8; --fg-xdim: #64748b;
+    --i-bg: #1e3a8a22; --i-border: #1d4ed8;
+    --c-bg: #4c1d9522; --c-border: #7c3aed;
+    --f-bg: #16425022; --f-border: #0e7490;
+    --r-bg: #78350f22; --r-border: #b45309;
+    --score: #f8fafc;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg:       #0f172a; --surface:  #1e293b; --surface2: #263347;
+  --border:   #334155; --fg:       #e2e8f0; --fg-dim:   #94a3b8; --fg-xdim: #64748b;
+  --i-bg: #1e3a8a22; --i-border: #1d4ed8;
+  --c-bg: #4c1d9522; --c-border: #7c3aed;
+  --f-bg: #16425022; --f-border: #0e7490;
+  --r-bg: #78350f22; --r-border: #b45309;
+  --score: #f8fafc;
+  color-scheme: dark;
+}
+
+/* ── Reset & base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg); color: var(--fg);
+  font-family: var(--font-body); font-size: 15px; line-height: 1.6;
+  padding-block: 32px;
+  padding-left:  max(16px, env(safe-area-inset-left,  0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+textarea, input, select {
+  font-family: var(--font-body); font-size: 14px;
+  color: var(--fg); background: var(--surface);
+  border: 1.5px solid var(--border); border-radius: 8px;
+  padding: 10px 12px; width: 100%; resize: vertical;
+  transition: border-color .15s;
+  outline: none;
+}
+textarea:focus, input:focus, select:focus { border-color: var(--i); }
+textarea { min-height: 90px; }
+label { display: block; font-size: .78rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 5px; }
+
+/* ── Layout ───────────────────────────────────────────────── */
+.wrapper { max-width: 760px; margin: 0 auto; }
+
+/* ── Header ───────────────────────────────────────────────── */
+.header { margin-bottom: 28px; }
+.header-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 6px; }
+.logo {
+  font-family: var(--font-head); font-size: 1.5rem; font-weight: 700;
+  letter-spacing: -.01em; color: var(--fg);
+}
+.logo span { color: var(--gold); }
+.subtitle { font-size: .8rem; color: var(--fg-dim); letter-spacing: .06em; text-transform: uppercase; }
+
+/* ── ICFR meter ───────────────────────────────────────────── */
+.icfr-bar {
+  display: flex; gap: 3px; border-radius: 8px; overflow: hidden;
+  margin-top: 10px; height: 6px;
+}
+.icfr-bar span {
+  flex: 1; opacity: .3; transition: opacity .3s;
+}
+.icfr-bar span.filled { opacity: 1; }
+.bar-i { background: var(--i); }
+.bar-c { background: var(--c); }
+.bar-f { background: var(--f); }
+.bar-r { flex: 2 !important; background: var(--r); }
+
+/* ── Component cards ──────────────────────────────────────── */
+.components { display: grid; gap: 14px; margin-bottom: 24px; }
+
+.comp-card {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: border-color .15s;
+}
+.comp-card.active-i { border-color: var(--i-border); }
+.comp-card.active-c { border-color: var(--c-border); }
+.comp-card.active-f { border-color: var(--f-border); }
+.comp-card.active-r { border-color: var(--r-border); }
+
+.comp-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 16px;
+}
+.comp-badge {
+  font-family: var(--font-head); font-weight: 700; font-size: .9rem;
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; letter-spacing: .02em;
+}
+.badge-i { background: var(--i-bg); color: var(--i); }
+.badge-c { background: var(--c-bg); color: var(--c); }
+.badge-f { background: var(--f-bg); color: var(--f); }
+.badge-r { background: var(--r-bg); color: var(--r); }
+
+.comp-meta { flex: 1; min-width: 0; }
+.comp-name { font-weight: 700; font-size: .92rem; }
+.comp-desc { font-size: .78rem; color: var(--fg-dim); line-height: 1.4; }
+.comp-pts {
+  font-family: var(--font-head); font-weight: 700;
+  font-size: 1.1rem; color: var(--fg-dim);
+  flex-shrink: 0;
+}
+
+.comp-body { padding: 0 16px 16px; }
+.comp-hint {
+  font-size: .78rem; color: var(--fg-xdim);
+  margin-bottom: 8px; line-height: 1.5;
+  padding: 8px 10px;
+  background: var(--surface2);
+  border-radius: 6px;
+}
+.comp-hint strong { color: var(--fg-dim); }
+
+/* ── Score panel ──────────────────────────────────────────── */
+.score-panel {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 24px;
+}
+.score-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.score-num {
+  font-family: var(--font-head); font-weight: 700;
+  font-size: 3rem; color: var(--score); line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.score-num span { font-size: 1.2rem; color: var(--fg-dim); }
+.medal-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.medal {
+  display: flex; align-items: center; gap: 6px;
+  font-size: .78rem; font-weight: 600;
+  padding: 5px 11px; border-radius: 20px;
+  border: 1.5px solid var(--border);
+  color: var(--fg-dim); cursor: default;
+  transition: all .2s;
+}
+.medal.active { border-color: currentColor; color: var(--fg); }
+.medal-gold.active  { color: #b45309; border-color: #fcd34d; background: #fffbeb; }
+.medal-silver.active{ color: #475569; border-color: #94a3b8; background: #f1f5f9; }
+.medal-bronze.active{ color: #92400e; border-color: #d97706; background: #fff7ed; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .medal-gold.active  { background: #78350f33; }
+  :root:not([data-theme="light"]) .medal-silver.active{ background: #33415533; }
+  :root:not([data-theme="light"]) .medal-bronze.active{ background: #78350f22; }
+}
+
+.score-breakdown {
+  margin-top: 14px;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+}
+.score-item {
+  text-align: center; padding: 10px 6px;
+  background: var(--surface2); border-radius: 8px;
+}
+.score-item-label { font-size: .7rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--fg-dim); }
+.score-item-val { font-family: var(--font-head); font-weight: 700; font-size: 1.3rem; font-variant-numeric: tabular-nums; }
+.val-i { color: var(--i); }
+.val-c { color: var(--c); }
+.val-f { color: var(--f); }
+.val-r { color: var(--r); }
+
+/* ── Actions ──────────────────────────────────────────────── */
+.actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--font-head); font-size: .88rem; font-weight: 600;
+  padding: 10px 18px; border-radius: 8px; cursor: pointer;
+  border: 1.5px solid transparent; transition: all .15s;
+}
+.btn-primary { background: var(--i); color: #fff; }
+.btn-primary:hover { filter: brightness(1.1); }
+.btn-secondary { background: var(--surface2); color: var(--fg); border-color: var(--border); }
+.btn-secondary:hover { border-color: var(--fg-dim); }
+.btn-copy { background: var(--surface2); color: var(--fg); border-color: var(--border); }
+.btn-copy:hover { border-color: var(--fg-dim); }
+
+/* ── Preview ──────────────────────────────────────────────── */
+.preview-section { margin-top: 24px; display: none; }
+.preview-section.visible { display: block; }
+.preview-title {
+  font-family: var(--font-head); font-weight: 700;
+  font-size: .88rem; letter-spacing: .05em; text-transform: uppercase;
+  color: var(--fg-dim); margin-bottom: 10px;
+}
+.preview-box {
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  font-size: .88rem; line-height: 1.7;
+  white-space: pre-wrap; word-break: break-word;
+}
+.preview-tag { font-weight: 700; }
+.preview-tag.ti { color: var(--i); }
+.preview-tag.tc { color: var(--c); }
+.preview-tag.tf { color: var(--f); }
+.preview-tag.tr { color: var(--r); }
+
+/* ── Copy toast ───────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: var(--fg); color: var(--bg);
+  font-size: .82rem; font-weight: 600; padding: 8px 18px;
+  border-radius: 20px; opacity: 0;
+  transition: transform .25s, opacity .25s;
+  pointer-events: none; z-index: 100;
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+/* ── Responsive ───────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .score-breakdown { grid-template-columns: repeat(2, 1fr); }
+  .score-num { font-size: 2.2rem; }
+}
+</style>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="wrapper">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-top">
+      <div class="logo">Plantilla <span>ICFR</span></div>
+    </div>
+    <div class="subtitle">Instrucción · Contexto · Formato · Restricción</div>
+    <div class="icfr-bar" id="icfr-bar">
+      <span class="bar-i" id="bar-i"></span>
+      <span class="bar-c" id="bar-c"></span>
+      <span class="bar-f" id="bar-f"></span>
+      <span class="bar-r" id="bar-r"></span>
+    </div>
+  </div>
+
+  <!-- Componentes ICFR -->
+  <div class="components">
+
+    <!-- [I] Instrucción -->
+    <div class="comp-card" id="card-i">
+      <div class="comp-header">
+        <div class="comp-badge badge-i">[I]</div>
+        <div class="comp-meta">
+          <div class="comp-name">Instrucción</div>
+          <div class="comp-desc">¿Qué debe hacer exactamente el LLM?</div>
+        </div>
+        <div class="comp-pts" id="pts-i">0/20</div>
+      </div>
+      <div class="comp-body">
+        <div class="comp-hint">
+          <strong>Incluye:</strong> verbo de acción + objeto + objetivo.
+          Ej: "Redacta", "Elabora", "Diseña", "Analiza", "Explica"…
+        </div>
+        <label for="inp-i">Tu instrucción</label>
+        <textarea id="inp-i" placeholder="Escribe aquí la tarea concreta que debe realizar el LLM…" oninput="update()"></textarea>
+      </div>
+    </div>
+
+    <!-- [C] Contexto -->
+    <div class="comp-card" id="card-c">
+      <div class="comp-header">
+        <div class="comp-badge badge-c">[C]</div>
+        <div class="comp-meta">
+          <div class="comp-name">Contexto</div>
+          <div class="comp-desc">¿Quién es el LLM y cuál es la situación?</div>
+        </div>
+        <div class="comp-pts" id="pts-c">0/20</div>
+      </div>
+      <div class="comp-body">
+        <div class="comp-hint">
+          <strong>Incluye:</strong> rol del LLM + dominio de especialización + situación específica.
+          Ej: "Eres un/a [profesión] con experiencia en [área], trabajando en [situación]…"
+        </div>
+        <label for="inp-c">Tu contexto</label>
+        <textarea id="inp-c" placeholder="Define el rol, el dominio y la situación del problema…" oninput="update()"></textarea>
+      </div>
+    </div>
+
+    <!-- [F] Formato -->
+    <div class="comp-card" id="card-f">
+      <div class="comp-header">
+        <div class="comp-badge badge-f">[F]</div>
+        <div class="comp-meta">
+          <div class="comp-name">Formato</div>
+          <div class="comp-desc">¿Cómo debe estructurarse la respuesta?</div>
+        </div>
+        <div class="comp-pts" id="pts-f">0/20</div>
+      </div>
+      <div class="comp-body">
+        <div class="comp-hint">
+          <strong>Incluye:</strong> tipo de estructura + extensión + elementos requeridos.
+          Ej: tabla, lista numerada, carta formal, guión, párrafos, número de ítems, secciones…
+        </div>
+        <label for="inp-f">Tu formato</label>
+        <textarea id="inp-f" placeholder="Especifica la estructura, extensión y elementos que debe tener la respuesta…" oninput="update()"></textarea>
+      </div>
+    </div>
+
+    <!-- [R] Restricción -->
+    <div class="comp-card" id="card-r">
+      <div class="comp-header">
+        <div class="comp-badge badge-r">[R]</div>
+        <div class="comp-meta">
+          <div class="comp-name">Restricción</div>
+          <div class="comp-desc">¿Qué límites debe respetar el LLM?</div>
+        </div>
+        <div class="comp-pts" id="pts-r">0/40</div>
+      </div>
+      <div class="comp-body">
+        <div class="comp-hint">
+          <strong>Incluye:</strong> qué NO debe hacer + condiciones obligatorias + parámetros de calidad.
+          Mínimo 2 restricciones concretas y verificables. <strong>Vale el doble (40 pts).</strong>
+        </div>
+        <label for="inp-r">Tus restricciones</label>
+        <textarea id="inp-r" placeholder="Define al menos 2 límites concretos que el LLM debe respetar…" oninput="update()" style="min-height:110px;"></textarea>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Score panel -->
+  <div class="score-panel">
+    <div class="score-row">
+      <div>
+        <div class="score-num" id="total-score">0 <span>/ 100</span></div>
+      </div>
+      <div class="medal-row">
+        <div class="medal medal-gold"   id="med-gold">🥇 Oro ≥85</div>
+        <div class="medal medal-silver" id="med-silver">🥈 Plata 65–84</div>
+        <div class="medal medal-bronze" id="med-bronze">🥉 Bronce &lt;65</div>
+      </div>
+    </div>
+    <div class="score-breakdown">
+      <div class="score-item"><div class="score-item-label">[I]</div><div class="score-item-val val-i" id="sb-i">0</div></div>
+      <div class="score-item"><div class="score-item-label">[C]</div><div class="score-item-val val-c" id="sb-c">0</div></div>
+      <div class="score-item"><div class="score-item-label">[F]</div><div class="score-item-val val-f" id="sb-f">0</div></div>
+      <div class="score-item"><div class="score-item-label">[R]</div><div class="score-item-val val-r" id="sb-r">0</div></div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <button class="btn btn-primary" onclick="showPreview()">👁 Ver prompt completo</button>
+    <button class="btn btn-copy"    onclick="copyPrompt()">📋 Copiar prompt</button>
+    <button class="btn btn-secondary" onclick="clearAll()">🗑 Limpiar</button>
+  </div>
+
+  <!-- Preview -->
+  <div class="preview-section" id="preview-section">
+    <div class="preview-title">Prompt generado</div>
+    <div class="preview-box" id="preview-box"></div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">✅ Prompt copiado</div>
+
+<script>
+function score(text, max) {
+  const t = text.trim();
+  if (!t) return 0;
+  const words = t.split(/\s+/).filter(Boolean).length;
+  if (words < 4) return Math.round(max * 0.3);
+  if (words < 10) return Math.round(max * 0.65);
+  if (words < 20) return Math.round(max * 0.85);
+  return max;
+}
+
+function update() {
+  const i = document.getElementById('inp-i').value;
+  const c = document.getElementById('inp-c').value;
+  const f = document.getElementById('inp-f').value;
+  const r = document.getElementById('inp-r').value;
+
+  const si = score(i, 20);
+  const sc = score(c, 20);
+  const sf = score(f, 20);
+  const sr = score(r, 40);
+  const total = si + sc + sf + sr;
+
+  document.getElementById('pts-i').textContent = si + '/20';
+  document.getElementById('pts-c').textContent = sc + '/20';
+  document.getElementById('pts-f').textContent = sf + '/20';
+  document.getElementById('pts-r').textContent = sr + '/40';
+  document.getElementById('total-score').innerHTML = total + ' <span>/ 100</span>';
+  document.getElementById('sb-i').textContent = si;
+  document.getElementById('sb-c').textContent = sc;
+  document.getElementById('sb-f').textContent = sf;
+  document.getElementById('sb-r').textContent = sr;
+
+  // Active card borders
+  ['i','c','f','r'].forEach(k => {
+    const card = document.getElementById('card-' + k);
+    card.className = 'comp-card' + (document.getElementById('inp-' + k).value.trim() ? ' active-' + k : '');
+  });
+
+  // Bar fill
+  ['i','c','f','r'].forEach(k => {
+    document.getElementById('bar-' + k).classList.toggle('filled', !!document.getElementById('inp-' + k).value.trim());
+  });
+
+  // Medals
+  document.getElementById('med-gold').classList.toggle('active', total >= 85);
+  document.getElementById('med-silver').classList.toggle('active', total >= 65 && total < 85);
+  document.getElementById('med-bronze').classList.toggle('active', total < 65 && total > 0);
+}
+
+function buildPrompt() {
+  const i = document.getElementById('inp-i').value.trim();
+  const c = document.getElementById('inp-c').value.trim();
+  const f = document.getElementById('inp-f').value.trim();
+  const r = document.getElementById('inp-r').value.trim();
+  if (!i && !c && !f && !r) return '';
+  const parts = [];
+  if (i) parts.push('[I] ' + i);
+  if (c) parts.push('[C] ' + c);
+  if (f) parts.push('[F] ' + f);
+  if (r) parts.push('[R] ' + r);
+  return parts.join('\n\n');
+}
+
+function showPreview() {
+  const prompt = buildPrompt();
+  if (!prompt) return;
+  const box = document.getElementById('preview-box');
+  box.innerHTML = prompt
+    .replace(/\[I\]/g, '<span class="preview-tag ti">[I]</span>')
+    .replace(/\[C\]/g, '<span class="preview-tag tc">[C]</span>')
+    .replace(/\[F\]/g, '<span class="preview-tag tf">[F]</span>')
+    .replace(/\[R\]/g, '<span class="preview-tag tr">[R]</span>');
+  document.getElementById('preview-section').classList.add('visible');
+  document.getElementById('preview-section').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function copyPrompt() {
+  const prompt = buildPrompt();
+  if (!prompt) return;
+  const toast = document.getElementById('toast');
+  try {
+    navigator.clipboard.writeText(prompt).then(() => showToast()).catch(() => fallbackCopy(prompt));
+  } catch(e) { fallbackCopy(prompt); }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand('copy'); } catch(e) {}
+  document.body.removeChild(ta);
+  showToast();
+}
+
+function showToast() {
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function clearAll() {
+  ['i','c','f','r'].forEach(k => document.getElementById('inp-' + k).value = '');
+  document.getElementById('preview-section').classList.remove('visible');
+  update();
+}
+</script>
+
+</body></html>
